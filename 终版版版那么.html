@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>欢迎使用</title>
 </head>
 <body>
 
-<h2>汇爱医疗转运服务</h2>
+<h2>欢迎使用汇爱医疗转运服务</h2>
 <label for="mileage">输入里程(km):</label>
 <input type="number" id="mileage">
 
@@ -48,7 +49,46 @@
 <h3>汇爱补贴: <span id="subsidy">0</span> 元</h3>
 <h3>应收家属: <span id="totalFee">0</span> 元</h3>
 
+<h3>手写签名:</h3>
+<canvas id="signature-pad" width="400" height="200" style="border: 1px solid black;"></canvas>
+<button id="clear">清除签名</button>
+<button id="save">保存签名</button>
+    
+<h3>支付二维码:</h3>
+<img src="jinvx.png" alt="微信" width="130">
+
+<br> <!-- 这里添加了一个换行 -->
+    
+<img src="jinzfb.png" alt="支付宝" width="130">
+
+<br> <!-- 这里添加了一个换行 -->
+    
+<img src="xyk.png" alt="信用卡" width="130">
+    
 <script>
+window.onload = function() {
+    // 调整canvas的内部尺寸以匹配其显示尺寸
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
+    // 初始化SignaturePad
+    const signaturePad = new SignaturePad(canvas);
+
+    document.getElementById('clear').addEventListener('click', function() {
+        signaturePad.clear();
+    });
+
+    document.getElementById('save').addEventListener('click', function() {
+        if (signaturePad.isEmpty()) {
+            alert("请签名后再保存");
+        } else {
+            const data = signaturePad.toDataURL();
+            console.log(data);  // 这里，您可以看到签名的数据URL
+            // 根据您的需要进一步处理这个数据，比如发送到服务器或保存到本地。
+        }
+    });
+}
+    
 function calculate() {
     const mileage = parseFloat(document.getElementById("mileage").value);
     const patientType = document.getElementById("patientType").value;
@@ -136,6 +176,24 @@ function calculate() {
     document.getElementById("subsidy").innerText = subsidy.toFixed(2);
     document.getElementById("totalFee").innerText = totalCost.toFixed(2);
 }
+
+// 这里开始是关于签名板的代码
+const canvas = document.getElementById('signature-pad');
+const signaturePad = new SignaturePad(canvas);
+
+document.getElementById('clear').addEventListener('click', function() {
+    signaturePad.clear();
+});
+
+document.getElementById('save').addEventListener('click', function() {
+    if (signaturePad.isEmpty()) {
+        alert("请签名后再保存");
+    } else {
+        const data = signaturePad.toDataURL();
+        console.log(data);  // 这里，您可以看到签名的数据URL
+        // 根据您的需要进一步处理这个数据，比如发送到服务器或保存到本地。
+    }
+});
 </script>
 </body>
 </html>
