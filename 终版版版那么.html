@@ -109,7 +109,7 @@ function calculate() {
         case "recovery":
             if (mileage <= 3) carCost = 500;
             else if (mileage <= 6) carCost = 550;
-            else if (mileage <= 25) carCost = 600 + (mileage - 7) * 19;
+            else if (mileage <= 25) carCost = 600 + (mileage - 7) * 13;
             else if (mileage <= 80) carCost = 970 + (mileage - 26) * 10;
             else if (mileage <= 100) carCost = 20 * mileage;
             else if (mileage <= 200) carCost = 19 * mileage;
@@ -120,7 +120,7 @@ function calculate() {
         case "clear":
             if (mileage <= 3) carCost = 600;
             else if (mileage <= 6) carCost = 650;
-            else if (mileage <= 25) carCost = 700 + (mileage - 7) * 19;
+            else if (mileage <= 25) carCost = 650 + (mileage - 7) * 15;
             else if (mileage <= 80) carCost = 1070 + (mileage - 26) * 10;
             else if (mileage <= 100) carCost = 20 * mileage;
             else if (mileage <= 200) carCost = 19 * mileage;
@@ -129,9 +129,9 @@ function calculate() {
             else carCost = 14 * mileage;
             break;
         case "coma":
-            if (mileage <= 3) carCost = 750;
-            else if (mileage <= 6) carCost = 800;
-            else if (mileage <= 25) carCost = 800 + (mileage - 7) * 19;
+            if (mileage <= 3) carCost = 700;
+            else if (mileage <= 6) carCost = 750;
+            else if (mileage <= 25) carCost = 750 + (mileage - 7) * 19;
             else if (mileage <= 80) carCost = 1250 + (mileage - 26) * 10;
             else if (mileage <= 100) carCost = 23 * mileage;
             else if (mileage <= 200) carCost = 22 * mileage;
