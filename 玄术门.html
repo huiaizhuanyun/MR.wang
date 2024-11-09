@@ -1,0 +1,2163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>玄术门</title>
+    <style>
+        /* 通用样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 导航栏样式 */
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin-bottom: -1px;
+            background: #f8f8f8;
+            margin-right: 5px;
+        }
+
+        .nav-tab.active {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-bottom-color: transparent;
+        }
+
+        /* 内容区域样式 */
+        .content-sections {
+            padding: 20px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* 密码验证界面样式 */
+        #passwordContainer {
+            max-width: 400px;
+            margin: 100px auto;
+            text-align: center;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #passwordInput {
+            width: 200px;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #passwordSubmit {
+            padding: 8px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #passwordSubmit:hover {
+            background: #45a049;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* 农历生日计算器样式 */
+        .birthday-calc input, 
+        .birthday-calc select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .birthday-calc button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .birthday-calc button:hover {
+            background: #0056b3;
+        }
+
+        /* 六壬预测样式 */
+        .liuren-calc input,
+        .liuren-calc select {
+            width: 60px;
+            margin-right: 10px;
+            padding: 5px;
+        }
+
+        /* 磁场寻物店铺样式 */
+        .magnetic-field table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .magnetic-field td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        /* 十二神批命样式 */
+        .destiny-calc table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .destiny-calc td, 
+        .destiny-calc th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .note {
+            color: red;
+            margin-top: 10px;
+        }
+
+        /* 结果显示区域样式 */
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .info {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        /* 在style标签内添加 */
+        .magnetic-field .section {
+            display: none;
+            padding: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 密码验证界面 -->
+    <div id="passwordContainer">
+        <h2>请输入密码</h2>
+        <input type="password" id="passwordInput" placeholder="输入密码">
+        <button id="passwordSubmit">提交</button>
+        <p id="passwordError" style="color: red; display: none;">密码错误，请重试。</p>
+    </div>
+
+    <!-- 主界面 -->
+    <div class="container hidden" id="mainContent">
+        <h1>命理综合测算系统</h1>
+        
+        <!-- 导航标签 -->
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="birthdayCalc">农历生日计算</div>
+            <div class="nav-tab" data-tab="liurenCalc">六壬预测</div>
+            <div class="nav-tab" data-tab="magneticField">磁场寻物店铺</div>
+            <div class="nav-tab" data-tab="destinyCalc">十二神批命</div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-sections">
+            <!-- 农历生日计算内容 -->
+            <div id="birthdayCalc" class="content-section active birthday-calc">
+                <h2>农历生日计算器</h2>
+                <form id="birthdayForm">
+                    <label for="year">出生年份：</label>
+                    <input type="number" id="year" required>
+
+                    <label for="month">出生月份：</label>
+                    <input type="number" id="month" required>
+
+                    <label for="day">出生日期：</label>
+                    <input type="number" id="day" required>
+
+                    <label for="hour">出生时：</label>
+                    <input type="number" id="hour" required>
+
+                    <label for="minute">出生分：</label>
+                    <input type="number" id="minute" required>
+
+                    <label for="gender">性别：</label>
+                    <select id="gender" required>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                    </select>
+
+                    <label for="ageRange">年龄范围：</label>
+                    <select id="ageRange" required>
+                        <option value="0-20">0-20岁</option>
+                        <option value="20-40">20-40岁</option>
+                        <option value="40-60">40-60岁</option>
+                        <option value="60+">60岁以上</option>
+                    </select>
+
+                    <button type="submit">开启命运测试</button>
+                </form>
+
+                <div id="birthdayResult" class="result hidden">
+                    <p>您的年龄：<span id="age"></span>岁</p>
+                    <p>出生时辰：<span id="birthHourCycle"></span>时</p>
+                    <p>生肖：<span id="zodiac"></span></p>
+                    <p>八字数字：<span id="baZiNumbers"></span></p>
+                    <p>前四世：<span id="previousLives"></span></p>
+
+                    <label for="option">选择选项：</label>
+                    <select id="option">
+                        <option value="wearColor" selected>穿衣颜色</option>
+                        <option value="avoidColor">不要穿的颜色</option>
+                        <option value="wealthDirection">财的方向</option>
+                        <option value="nobleDirection">贵人方向</option>
+                        <option value="avoidWorkDirection">不要去工作的方向</option>
+                        <option value="disease">肢体疾病</option>
+                        <option value="partnerDirection">对象的方向</option>
+                        <option value="sanyuan">三元命</option>
+                    </select>
+
+                    <label for="nobleYear" id="nobleYearLabel" class="hidden">选择年份：</label>
+                    <input type="number" id="nobleYear" class="hidden">
+                </div>
+
+                <div id="finalResult" class="result hidden"></div>
+            </div>
+
+            <!-- 六壬预测内容 -->
+            <div id="liurenCalc" class="content-section liuren-calc">
+                <h2>六壬预测</h2>
+                <p>请输入三个数字（1-9）：</p>
+                <input type="number" id="num1" min="1" max="9">
+                <input type="number" id="num2" min="1" max="9">
+                <input type="number" id="num3" min="1" max="9">
+                
+                <label for="time">选择当前时辰（可选）：</label>
+                <select id="time">
+                    <option value="">--选择时辰--</option>
+                    <option value="子">子</option>
+                    <option value="丑">丑</option>
+                    <option value="寅">寅</option>
+                    <option value="卯">卯</option>
+                    <option value="辰">辰</option>
+                    <option value="巳">巳</option>
+                    <option value="午">午</option>
+                    <option value="未">未</option>
+                    <option value="申">申</option>
+                    <option value="酉">酉</option>
+                    <option value="戌">戌</option>
+                    <option value="亥">亥</option>
+                </select>
+                <button onclick="calculateLiuren()">计算</button>
+                <div id="liurenResult" class="result"></div>
+            </div>
+
+            <!-- 磁场寻物店铺内容 -->
+            <div id="magneticField" class="content-section magnetic-field">
+                <h2>选择功能</h2>
+                <select id="functionSelect" onchange="showSelectedFunction()">
+                    <option value="">请选择</option>
+                    <option value="genderPrediction">查生男生女</option>
+                    <option value="magneticField">磁场归藏</option>
+                    <option value="shopFortune">店铺凶吉</option>
+                    <option value="findObject">寻物</option>
+                    <option value="luoGongDuanFa">落宫断法</option>
+                </select>
+
+                <!-- 查生男生女 -->
+                <div id="genderPredictionSection" class="section">
+                    <h3>查生男生女</h3>
+                    <label for="fatherAge">父的周岁年龄：</label>
+                    <input type="number" id="fatherAge"><br>
+
+                    <label for="motherAge">母亲的周岁年龄：</label>
+                    <input type="number" id="motherAge"><br>
+
+                    <label for="monthOption">请选择：</label>
+                    <select id="monthOption">
+                        <option value="">请选择</option>
+                        <option value="predict">推测</option>
+                        <option value="oddMonth">奇数月</option>
+                        <option value="evenMonth">偶数月</option>
+                    </select><br>
+
+                    <button onclick="calculateGenderPrediction()">计算</button>
+                    <div id="genderResult" class="result"></div>
+
+                    <div class="note">
+                        <p><strong>生男孩（写两字念一遍）：</strong></p>
+                        <p>红纸黑字对联。</p>
+                        <p>念：7遍</p>
+                        <p>无思也，无为也，寂然不动，感而遂通。</p>
+                        <p>念完7遍的同时，要刚好写完这14字的对联。</p>
+                        <p>写：</p>
+                        <p>五更露结桃花实，二月春生燕子窝。</p>
+                        <p>写完以后拿到外面给太阳晒一晒，然后对着吹口气，拿回去，贴在床头，左右各一个。</p>
+                    </div>
+                </div>
+
+                <!-- 磁场归藏 -->
+                <div id="magneticFieldSection" class="section">
+                    <h3>磁场归藏</h3>
+                    <label for="doorDirection">入户门朝向：</label>
+                    <select id="doorDirection">
+                        <option value="">请选择</option>
+                        <option value="乾">乾（西北）</option>
+                        <option value="兑">兑（西）</option>
+                        <option value="离">离（南）</option>
+                        <option value="震">震（东）</option>
+                        <option value="巽">巽（东南）</option>
+                        <option value="坎">坎（北）</option>
+                        <option value="艮">艮（东北）</option>
+                        <option value="坤">坤（西南）</option>
+                    </select><br>
+
+                    <label for="roomTrigram">房间卦宫：</label>
+                    <select id="roomTrigram">
+                        <option value="">请选择</option>
+                        <option value="乾">乾（西北）</option>
+                        <option value="兑">兑（西）</option>
+                        <option value="离">离（南）</option>
+                        <option value="震">震（东）</option>
+                        <option value="巽">巽（东南）</option>
+                        <option value="坎">坎（北）</option>
+                        <option value="艮">艮（东北）</option>
+                        <option value="坤">坤（西南）</option>
+                    </select><br>
+
+                    <button onclick="calculateMagneticField()">计算</button>
+                    <div id="magneticResult" class="result"></div>
+                </div>
+
+                <!-- 店铺凶吉 -->
+                <div id="shopFortuneSection" class="section">
+                    <h3>店铺凶吉</h3>
+                    <label for="shopDirection">门口朝向：</label>
+                    <select id="shopDirection">
+                        <option value="">请选择</option>
+                        <option value="乾">乾</option>
+                        <option value="坎">坎</option>
+                        <option value="艮">艮</option>
+                        <option value="震">震</option>
+                        <option value="巽">巽</option>
+                        <option value="离">离</option>
+                        <option value="坤">坤</option>
+                        <option value="兑">兑</option>
+                    </select>
+                    <span id="directionInfo" class="info"></span><br>
+
+                    <label for="shopNumber">第几间：</label>
+                    <input type="number" id="shopNumber" min="1">
+                    <span id="countingInfo" class="info"></span><br>
+
+                    <label for="ownerZodiac">店主生肖：</label>
+                    <select id="ownerZodiac">
+                        <option value="">请选择</option>
+                        <option value="子">子（鼠）</option>
+                        <option value="丑">丑（牛）</option>
+                        <option value="寅">寅（虎）</option>
+                        <option value="卯">卯（兔）</option>
+                        <option value="辰">辰（龙）</option>
+                        <option value="巳">巳（蛇）</option>
+                        <option value="午">午（马）</option>
+                        <option value="未">未（羊）</option>
+                        <option value="申">申（猴）</option>
+                        <option value="酉">酉（鸡）</option>
+                        <option value="戌">戌（狗）</option>
+                        <option value="亥">亥（猪）</option>
+                    </select><br>
+
+                    <label for="fontColor">字体颜色：</label>
+                    <select id="fontColor">
+                        <option value="">请选择</option>
+                    </select><br>
+
+                    <label for="bgColor">背景颜色：</label>
+                    <select id="bgColor">
+                        <option value="">请选择</option>
+                    </select><br>
+
+                    <button onclick="calculateShopFortune()">计算</button>
+                    <div id="shopResult" class="result"></div>
+
+                    <div class="note">
+                        <p>旋转门要顺时针转，门口台阶要修坡，店铺间数左边越多为好，收银台要龙堂左侧靠墙，名字单数为吉。</p>
+                    </div>
+                </div>
+
+                <!-- 寻物 -->
+                <div id="findObjectSection" class="section">
+                    <h3>寻物</h3>
+                    <label for="solarDate">请输入阳历日期：</label>
+                    <input type="date" id="solarDate"><br>
+
+                    <button onclick="calculateFindObject()">查询</button>
+                    <div id="findObjectResult" class="result"></div>
+                </div>
+
+                <!-- 落宫断法 -->
+                <div id="luoGongDuanFaSection" class="section">
+                    <h3>宫断法</h3>
+                    <label for="luoGongDirection">选择方位：</label>
+                    <select id="luoGongDirection">
+                        <option value="">请选择</option>
+                        <option value="南方">南方</option>
+                        <option value="东南">东南</option>
+                        <option value="东方">东方</option>
+                        <option value="东北">东北</option>
+                        <option value="北方">北方</option>
+                        <option value="西北">西北</option>
+                        <option value="西方">西方</option>
+                        <option value="西南">西南</option>
+                    </select><br>
+
+                    <label for="objectType">选择物品：</label>
+                    <select id="objectType">
+                        <option value="">请选择</option>
+                        <option value="绿长直木">绿长直木</option>
+                        <option value="红尖形火">红尖火</option>
+                        <option value="蓝弯曲水">蓝弯曲水</option>
+                        <option value="黑金圆形金">黑金圆形金</option>
+                        <option value="白黄方形土">白黄方形土</option>
+                        <option value="钟表">钟表</option>
+                        <option value="剪刀">剪刀</option>
+                        <option value="钉子">钉子</option>
+                        <option value="绿植">绿植</option>
+                        <option value="棍棒">棍棒</option>
+                        <option value="鱼缸">鱼缸</option>
+                        <option value="福字">福字</option>
+                        <option value="寿字">寿字</option>
+                        <option value="打火机">打火机</option>
+                        <option value="厨灶">厨灶</option>
+                        <option value="电器">电器</option>
+                        <option value="桌子">桌子</option>
+                        <option value="床">床</option>
+                        <option value="柜子">柜子</option>
+                    </select><br>
+
+                    <button onclick="calculateLuoGong()">计算</button>
+                    <div id="luoGongResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 十二神批命内容 -->
+            <div id="destinyCalc" class="content-section destiny-calc">
+                <h2>命运测算</h2>
+                <table class="input-table">
+                    <tr>
+                        <td></td>
+                        <td>年柱</td>
+                        <td>月柱</td>
+                        <td>日柱</td>
+                        <td>时柱</td>
+                    </tr>
+                    <tr>
+                        <td>天干</td>
+                        <td><input id="tg0" placeholder="天干"></td>
+                        <td><input id="tg1" placeholder="天干"></td>
+                        <td><input id="tg2" placeholder="天干"></td>
+                        <td><input id="tg3" placeholder="天干"></td>
+                    </tr>
+                    <tr>
+                        <td>地支</td>
+                        <td><input id="dz0" placeholder="地支"></td>
+                        <td><input id="dz1" placeholder="地支"></td>
+                        <td><input id="dz2" placeholder="地支"></td>
+                        <td><input id="dz3" placeholder="地支"></td>
+                    </tr>
+                </table>
+
+                <p>
+                    选择预测尺度：
+                    <select id="scale" onchange="toggleDestinyInput()">
+                        <option value="命运">命运</option>
+                        <option value="大运">大运</option>
+                        <option value="流年">流年</option>
+                    </select>
+                </p>
+
+                <div id="extraInput" style="display: none;">
+                    <p>请输入运支或流年（子丑寅卯辰巳午未申酉戌亥）：
+                        <input id="extraBranch" placeholder="运支/流年">
+                    </p>
+                </div>
+
+                <button onclick="calculateDestiny()">计算</button>
+                <div id="destinyResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 密码验证逻辑
+        const correctPassword = '1310518645';
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordSubmit = document.getElementById('passwordSubmit');
+        const passwordError = document.getElementById('passwordError');
+        const passwordContainer = document.getElementById('passwordContainer');
+        const mainContent = document.getElementById('mainContent');
+
+        passwordSubmit.addEventListener('click', function() {
+            if (passwordInput.value === correctPassword) {
+                passwordContainer.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+            } else {
+                passwordError.style.display = 'block';
+            }
+        });
+
+        // 标签切换逻辑
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                navTabs.forEach(t => t.classList.remove('active'));
+                contentSections.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const targetId = tab.getAttribute('data-tab');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // 农历生日计算逻辑
+        function mod(n, m) {
+            return ((n % m) + m) % m;
+        }
+
+        const elements = {
+            year: document.getElementById('year'),
+            month: document.getElementById('month'),
+            day: document.getElementById('day'),
+            hour: document.getElementById('hour'),
+            minute: document.getElementById('minute'),
+            gender: document.getElementById('gender'),
+            ageRange: document.getElementById('ageRange'),
+            birthdayForm: document.getElementById('birthdayForm'),
+            birthdayResult: document.getElementById('birthdayResult'),
+            age: document.getElementById('age'),
+            birthHourCycle: document.getElementById('birthHourCycle'),
+            zodiac: document.getElementById('zodiac'),
+            baZiNumbers: document.getElementById('baZiNumbers'),
+            option: document.getElementById('option'),
+            finalResult: document.getElementById('finalResult'),
+            previousLives: document.getElementById('previousLives'),
+            nobleYearLabel: document.getElementById('nobleYearLabel'),
+            nobleYear: document.getElementById('nobleYear')
+        };
+
+        // 数字对应的五行映射
+        const numberToElementMap = {
+            "1": "水", "2": "水", "12": "水",
+            "3": "土", "8": "土", "9": "土",
+            "4": "木", "5": "木",
+            "6": "火", "7": "火",
+            "10": "金", "11": "金"
+        };
+
+        // 五行的颜色和方向属性
+        const wuxingProperties = {
+            "金": { colors: ["金", "黑"], directions: ["西", "西北"] },
+            "水": { colors: ["", "蓝", "棕"], directions: ["北", "北东", "北西"] },
+            "木": { colors: ["紫", "绿"], directions: ["东", "东南"] },
+            "火": { colors: ["粉", "红"], directions: ["南东", "南"] },
+            "土": { colors: ["白", "黄", "灰"], directions: ["东北", "南西", "西南"] }
+        };
+
+        // 五行生关系
+        const wuxingRelation = {
+            "金": { generate: "水", overcome: "木" },
+            "水": { generate: "木", overcome: "火" },
+            "木": { generate: "火", overcome: "土" },
+            "火": { generate: "土", overcome: "金" },
+            "土": { generate: "金", overcome: "水" }
+        };
+
+        // 地支对应的身体部位
+        const branchToBodyPart = {
+            "子": "泌尿系统", "丑": "左足", "寅": "左腿",
+            "卯": "左腰", "辰": "左臂", "巳": "左肩",
+            "午": "头部", "未": "右肩", "申": "右臂",
+            "酉": "右腰", "戌": "右腿", "亥": "右足"
+        };
+
+        // 方向的反方向映射
+        const oppositeDirections = {
+            "东": "西", "西": "东", "南": "北", "北": "南",
+            "东北": "西南", "西南": "东北", "东南": "西北", "西北": "东南",
+            "南东": "北西", "北西": "南东", "北东": "南西", "南西": "北东"
+        };
+
+        // 地支列表
+        const branchList = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑'];
+
+        // 地支对应的五行
+        const branchToElementMap = {
+            "子": "水", "丑": "土", "寅": "木", "卯": "木",
+            "辰": "土", "巳": "火", "午": "火", "未": "土",
+            "申": "金", "酉": "金", "戌": "土", "亥": "水"
+        };
+
+        // 三元命相关数据
+        const mingSequence = ['坎', '坤', '震', '巽', '中', '乾', '兑', '艮', '离'];
+        const eastFourHouses = ['坎', '离', '震', '巽'];
+        const westFourHouses = ['乾', '坤', '艮', '兑'];
+
+        let selectedNumber; // 体数字
+        let selectedWuxing; // 体五行
+        let previousLivesBranches = []; // 前四世的地支
+
+        // 农历生日计算器表单提交处理
+        elements.birthdayForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            calculateBirthday();
+        });
+
+        // 选项变化处理
+        elements.option.addEventListener('change', handleOption);
+
+        function calculateBirthday() {
+            // 获取表单数据
+            const year = parseInt(elements.year.value);
+            const month = parseInt(elements.month.value);
+            const day = parseInt(elements.day.value);
+            const hour = parseInt(elements.hour.value);
+            const minute = parseInt(elements.minute.value);
+            const gender = elements.gender.value;
+
+            // 验证输入
+            if (!validateBirthdayInput(year, month, day, hour, minute)) {
+                alert('请输入有效的日期和时间');
+                return;
+            }
+
+            // 计算年龄
+            const birthDate = new Date(year, month - 1, day, hour, minute);
+            const now = new Date();
+            let age = now.getFullYear() - birthDate.getFullYear();
+            const monthDiff = now.getMonth() - birthDate.getMonth();
+            const dayDiff = now.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+
+            // 计算时辰
+            const hourCycle = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+            const birthHourIndex = getChineseHourIndex(hour);
+            const birthHourCycle = hourCycle[birthHourIndex];
+
+            // 计算生肖
+            const zodiacCycle = ['子鼠', '丑牛', '寅虎', '卯兔', '辰龙', '巳蛇', '午马', '未羊', '申猴', '酉鸡', '戌狗', '亥猪'];
+            const zodiacIndex = mod((year - 4), 12);
+            const zodiac = zodiacCycle[zodiacIndex];
+
+            // 计算八字数字
+            const baZiNumbers = calculateBaZiNumbers(day, birthHourIndex, zodiacIndex, month);
+
+            // 计算前四世
+            const previousLives = calculatePreviousLives(zodiacIndex, month, day, birthHourIndex, gender);
+
+            // 更新结果显示
+            updateBirthdayResult(age, birthHourCycle, zodiac, baZiNumbers, previousLives);
+
+            // 显示结果区域
+            elements.birthdayResult.classList.remove('hidden');
+        }
+
+        function validateBirthdayInput(year, month, day, hour, minute) {
+            return !isNaN(year) && !isNaN(month) && !isNaN(day) && 
+                   !isNaN(hour) && !isNaN(minute) &&
+                   month >= 1 && month <= 12 &&
+                   day >= 1 && day <= 31 &&
+                   hour >= 0 && hour <= 23 &&
+                   minute >= 0 && minute <= 59;
+        }
+
+        function getChineseHourIndex(hour) {
+            if (hour === 23 || hour === 0) return 0; // 子时
+            if (hour >= 1 && hour <= 2) return 1; // 丑时
+            if (hour >= 3 && hour <= 4) return 2; // 寅时
+            if (hour >= 5 && hour <= 6) return 3; // 卯时
+            if (hour >= 7 && hour <= 8) return 4; // 辰时
+            if (hour >= 9 && hour <= 10) return 5; // 巳时
+            if (hour >= 11 && hour <= 12) return 6; // 午时
+            if (hour >= 13 && hour <= 14) return 7; // 未时
+            if (hour >= 15 && hour <= 16) return 8; // 申时
+            if (hour >= 17 && hour <= 18) return 9; // 酉时
+            if (hour >= 19 && hour <= 20) return 10; // 戌时
+            if (hour >= 21 && hour <= 22) return 11; // 亥时
+            return -1; // 无效时
+        }
+
+        function calculateBaZiNumbers(day, birthHourIndex, zodiacIndex, month) {
+            const numbers = [];
+            numbers.push(zodiacIndex + 1); // 年柱数字
+            numbers.push(month); // 月柱数字
+            
+            // 处理日柱数字
+            if (day <= 12) {
+                numbers.push(day);
+            } else {
+                const firstDigit = Math.floor(day / 10);
+                const lastDigit = day % 10;
+                numbers.push(firstDigit, 10);
+                if (lastDigit !== 0) {
+                    numbers.push(lastDigit);
+                }
+            }
+            
+            numbers.push(birthHourIndex + 1); // 时柱数字
+            return numbers;
+        }
+
+        function calculatePreviousLives(zodiacIndex, month, day, birthHourIndex, gender) {
+            const zodiacCycle = ['子鼠', '丑牛', '寅虎', '卯兔', '辰龙', '巳蛇', '午马', '未羊', '申猴', '酉鸡', '戌狗', '亥猪'];
+            const previousLives = [];
+            previousLivesBranches = [];
+            
+            // 第一世：出生年份的生肖
+            previousLives.push(zodiacCycle[zodiacIndex]);
+            previousLivesBranches.push(zodiacCycle[zodiacIndex].substring(0, 1));
+
+            let currentIndex = zodiacIndex;
+            if (gender === 'male') {
+                // 男性，顺序查找
+                currentIndex = mod(currentIndex + (month - 1), 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+
+                currentIndex = mod(currentIndex + (day - 1), 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+
+                currentIndex = mod(currentIndex + birthHourIndex, 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+            } else {
+                // 女性，逆序查找
+                currentIndex = mod(currentIndex - (month - 1), 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+
+                currentIndex = mod(currentIndex - (day - 1), 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+
+                currentIndex = mod(currentIndex - birthHourIndex, 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+            }
+
+            return previousLives;
+        }
+
+        function updateBirthdayResult(age, birthHourCycle, zodiac, baZiNumbers, previousLives) {
+            elements.age.textContent = age;
+            elements.birthHourCycle.textContent = birthHourCycle;
+            elements.zodiac.textContent = zodiac;
+            elements.baZiNumbers.textContent = baZiNumbers.join(', ');
+            elements.previousLives.textContent = previousLives.join('，');
+
+            // 根据年龄范围选择体数字
+            const ageRange = elements.ageRange.value;
+            if (ageRange === "0-20") {
+                selectedNumber = baZiNumbers[0];
+            } else if (ageRange === "20-40") {
+                selectedNumber = baZiNumbers[1];
+            } else if (ageRange === "40-60") {
+                selectedNumber = baZiNumbers[2];
+            } else {
+                selectedNumber = baZiNumbers[baZiNumbers.length - 1];
+            }
+
+            // 获取体五行
+            selectedWuxing = numberToElementMap[selectedNumber.toString()];
+        }
+
+        function handleOption() {
+            const option = elements.option.value;
+            let resultText = '';
+
+            // 根据选项显示或隐藏年份输入框
+            if (option === 'nobleDirection') {
+                elements.nobleYearLabel.classList.remove('hidden');
+                elements.nobleYear.classList.remove('hidden');
+                if (!elements.nobleYear.value) {
+                    elements.nobleYear.value = new Date().getFullYear();
+                }
+            } else {
+                elements.nobleYearLabel.classList.add('hidden');
+                elements.nobleYear.classList.add('hidden');
+            }
+
+            // 处理不同选项的计算逻辑
+            switch(option) {
+                case 'wearColor':
+                    resultText = calculateWearColor();
+                    break;
+                case 'avoidColor':
+                    resultText = calculateAvoidColor();
+                    break;
+                case 'wealthDirection':
+                    resultText = calculateWealthDirection();
+                    break;
+                case 'nobleDirection':
+                    resultText = calculateNobleDirection();
+                    break;
+                case 'avoidWorkDirection':
+                    resultText = calculateAvoidWorkDirection();
+                    break;
+                case 'disease':
+                    resultText = calculateDisease();
+                    break;
+                case 'partnerDirection':
+                    resultText = calculatePartnerDirection();
+                    break;
+                case 'sanyuan':
+                    resultText = calculateSanYuan();
+                    break;
+            }
+
+            elements.finalResult.textContent = resultText;
+            elements.finalResult.classList.remove('hidden');
+        }
+
+        // 计算穿衣颜色
+        function calculateWearColor() {
+            if (!selectedWuxing) return '无法计算，请先输入生日信息';
+            
+            // 获取生体五行的五行（谁生体五行）
+            for (let element in wuxingRelation) {
+                if (wuxingRelation[element].generate === selectedWuxing) {
+                    return `穿衣颜色：${wuxingProperties[element].colors.join('，')}`;
+                }
+            }
+            return '无法找到合适的颜色';
+        }
+
+        // 计算避免的颜色
+        function calculateAvoidColor() {
+            if (!selectedWuxing) return '无法计算，请先输入生日信息';
+            
+            // 克制体五行的五行和体五行所生的五行的颜色都要避免
+            let avoidColors = [];
+            
+            // 找出克制体五行的五行
+            for (let element in wuxingRelation) {
+                if (wuxingRelation[element].overcome === selectedWuxing) {
+                    avoidColors = avoidColors.concat(wuxingProperties[element].colors);
+                }
+            }
+            
+            // 体五行所的五行
+            const generatedElement = wuxingRelation[selectedWuxing].generate;
+            avoidColors = avoidColors.concat(wuxingProperties[generatedElement].colors);
+            
+            return `不穿的颜色：${avoidColors.join('，')}`;
+        }
+
+        // 计算财的方向
+        function calculateWealthDirection() {
+            if (!selectedWuxing) return '无法计算，请先输入生日信息';
+            
+            // 找出生体五行的五行的方向
+            for (let element in wuxingRelation) {
+                if (wuxingRelation[element].generate === selectedWuxing) {
+                    return `财的方向：${wuxingProperties[element].directions.join('，')}`;
+                }
+            }
+            return '无法找到合适的方向';
+        }
+
+        // 计算贵人方向
+        function calculateNobleDirection() {
+            if (!selectedWuxing) return '无法计算，请先输入生日信息';
+            
+            const nobleYear = parseInt(elements.nobleYear.value);
+            if (isNaN(nobleYear)) return '请输入有效的年份';
+
+            const birthYear = parseInt(elements.year.value);
+            const lastDigit = birthYear % 10;
+
+            const lastDigitToGuirenMap = {
+                0: ['午', '寅'],
+                1: ['午', '寅'],
+                2: ['巳', '卯'],
+                3: ['巳', '卯'],
+                4: ['丑', '未'],
+                5: ['申', '子'],
+                6: ['酉', '亥'],
+                7: ['酉', '亥'],
+                8: ['丑', '未'],
+                9: ['申', '子']
+            };
+
+            const guirenBranches = lastDigitToGuirenMap[lastDigit];
+            if (!guirenBranches) return '无法计算贵人方向';
+
+            const nobleYearBranchIndex = mod((nobleYear - 4), 12);
+            const { firstOccurrences, secondOccurrences } = findGuirenNumbers(nobleYearBranchIndex, guirenBranches);
+
+            const numberToDirectionMap = {
+                1: '家附近',
+                2: '西北',
+                3: '西',
+                4: '东北',
+                5: '南',
+                6: '北',
+                7: '西南',
+                8: '东',
+                9: '东南'
+            };
+
+            const firstDirections = firstOccurrences.map(num => numberToDirectionMap[num]).join('，');
+            const secondDirections = secondOccurrences.map(num => numberToDirectionMap[num]).join('，');
+
+            return `近贵人方位：${firstDirections}\n远贵人方位：${secondDirections}`;
+        }
+
+        function findGuirenNumbers(nobleYearBranchIndex, guirenBranches) {
+            const numbers = [1,2,3,4,5,6,7,8,9];
+            let firstOccurrences = [];
+            let secondOccurrences = [];
+            let numberIndex = 0;
+            let branchIndex = nobleYearBranchIndex;
+            let foundCounts = {};
+
+            // 寻找第一次出现的贵人
+            while (firstOccurrences.length < guirenBranches.length) {
+                let currentBranch = branchList[branchIndex % 12];
+                let currentNumber = numbers[numberIndex % 9];
+                if (guirenBranches.includes(currentBranch) && !foundCounts[currentBranch]) {
+                    firstOccurrences.push(currentNumber);
+                    foundCounts[currentBranch] = 1;
+                }
+                branchIndex++;
+                numberIndex++;
+            }
+
+            // 寻找第二次出现的贵人
+            while (secondOccurrences.length < guirenBranches.length) {
+                let currentBranch = branchList[branchIndex % 12];
+                let currentNumber = numbers[numberIndex % 9];
+                if (guirenBranches.includes(currentBranch) && foundCounts[currentBranch] === 1) {
+                    secondOccurrences.push(currentNumber);
+                    foundCounts[currentBranch] = 2;
+                }
+                branchIndex++;
+                numberIndex++;
+            }
+
+            return { firstOccurrences, secondOccurrences };
+        }
+
+        // 计算不要去工作的方向
+        function calculateAvoidWorkDirection() {
+            if (!selectedWuxing) return '无法计算，请先输入生日信息';
+            
+            // 被体五行克的五行方向需要避免
+            const overcomeElement = wuxingRelation[selectedWuxing].overcome;
+            return `不要去工作的方向：${wuxingProperties[overcomeElement].directions.join('，')}`;
+        }
+
+        // 计算肢体疾病
+        function calculateDisease() {
+            if (previousLivesBranches.length !== 4) {
+                return '无法计算肢体疾病，请确保已正确输入生日信息。';
+            }
+            
+            const diseases = previousLivesBranches.map(branch => {
+                return branchToBodyPart[branch] || '未知部位';
+            });
+            
+            return `可能的肢体疾病部位：${diseases.join('，')}`;
+        }
+
+        // 计算对象的方向
+        function calculatePartnerDirection() {
+            const month = parseInt(elements.month.value);
+            const day = parseInt(elements.day.value);
+            if (isNaN(month) || isNaN(day)) return '请输入有效的月份和日期';
+
+            // 以寅为1，计算月份对应的地支
+            const monthBranchIndex = mod((month - 1), 12);
+            let currentIndex = monthBranchIndex;
+            // 计算日期对应的地支
+            currentIndex = mod(currentIndex + (day - 1), 12);
+            const finalBranch = branchList[currentIndex];
+
+            // 获取五行
+            const wuxing = branchToElementMap[finalBranch];
+            if (!wuxing) return '无法找到对应的五行信息';
+
+            // 获取方向并取反
+            const directions = wuxingProperties[wuxing].directions;
+            if (directions.length === 0) return '无法找到对应的方向信息';
+
+            const originalDirection = directions[0];
+            const oppositeDirection = oppositeDirections[originalDirection] || '未知方向';
+            
+            return `对象方向：${oppositeDirection}`;
+        }
+
+        // 计算三元命
+        function calculateSanYuan() {
+            const year = parseInt(elements.year.value);
+            const gender = elements.gender.value;
+            if (isNaN(year)) return '请输入有效的年份';
+
+            let index;
+            let ming;
+
+            if (gender === 'male') {
+                // 男性，以1964年的"离"为起点，逆序
+                const baseYear = 1964;
+                const yearsDifference = year - baseYear;
+                index = mod(mingSequence.indexOf('离') - yearsDifference, mingSequence.length);
+                ming = mingSequence[index];
+                if (ming === '中') ming = '坤';
+            } else {
+                // 女性，以1964年的"乾"为起点，顺序
+                const baseYear = 1964;
+                const yearsDifference = year - baseYear;
+                index = mod(mingSequence.indexOf('乾') + yearsDifference, mingSequence.length);
+                ming = mingSequence[index];
+                if (ming === '中') ming = '艮';
+            }
+
+            // 判断适合的四宅
+            const suitableHouses = westFourHouses.includes(ming) ? 
+                '西四宅（乾、坤、艮、兑）' : 
+                '东四宅（坎、离、震、巽）';
+
+            // 对应的疾病
+            const diseaseMap = {
+                '乾': '肺部、呼吸系统、头疼、脑血栓、脑溢血、精神异常疾病',
+                '坤': '消化、腹痛、神经衰弱、血脂稠、脑血栓、肾亏、结石、囊肿疾病',
+                '艮': '消化、脊骨、手疾、糖尿病，女性宜得结石、腰间盘突出',
+                '兑': '肺部、口舌疾病、右肩、小肠疾病',
+                '坎': '肾脏、泌尿、风湿性关节炎',
+                '离': '心脏病、视力头晕、情不好，女性宜患子宫卵巢病',
+                '震': '膝盖以下疾病、胰腺、心梗',
+                '巽': '腿足、心肺、中风、肩周炎'
+            };
+
+            const disease = diseaseMap[ming] || '未知疾病';
+
+            return `${ming}命，适合住${suitableHouses}，床头同向。易得${disease}。`;
+        }
+
+        // 六壬预测相关函数
+        function calculateLiuren() {
+            const num1 = parseInt(document.getElementById('num1').value);
+            const num2 = parseInt(document.getElementById('num2').value);
+            const num3 = parseInt(document.getElementById('num3').value);
+            const time = document.getElementById('time').value;
+
+            if (isNaN(num1) || isNaN(num2) || isNaN(num3) ||
+                num1 < 1 || num1 > 9 || num2 < 1 || num2 > 9 || num3 < 1 || num3 > 9) {
+                alert('请输入1到9之间的数字！');
+                return;
+            }
+
+            // 六宫计算
+            const palaces = ["大安", "留连", "速喜", "赤口", "小吉", "空亡"];
+            let index1 = (num1 - 1) % 6;
+            let palace1 = palaces[index1];
+            let index2 = (index1 + num2 - 1) % 6;
+            let palace2 = palaces[index2];
+            let index3 = (index2 + num3 - 1) % 6;
+            let palace3 = palaces[index3];
+
+            // 获取五行和阴阳属性
+            const elements = {
+                "大安": "木", "留连": "土", "速喜": "火",
+                "赤口": "金", "小吉": "水", "空亡": "土"
+            };
+            const yinYang = {
+                "大安": "阳", "留连": "阴", "速喜": "阳",
+                "赤口": "阳", "小吉": "阳", "空亡": "阳"
+            };
+
+            // 生克关系判断
+            const relations = getLiurenRelations([
+                { palace: palace1, element: elements[palace1] },
+                { palace: palace2, element: elements[palace2] },
+                { palace: palace3, element: elements[palace3] }
+            ]);
+
+            // 时辰比较
+            let timeResult = "";
+            if (time) {
+                timeResult = compareLiurenWithTime(
+                    elements[palace3],
+                    yinYang[palace3],
+                    palace3,
+                    timeElements[time].element,
+                    timeElements[time].yinYang
+                );
+            }
+
+            // 显示结果
+            const meanings = {
+                "大安": "命宫，事业宫，取向代表吉祥，确定，安分，不动，没有变动。",
+                "留连": "田宅宫，管理宫，代表拖拉，纠缠，延迟，有阻力，很难成功。",
+                "速喜": "感情宫，夫妻宫，取向代表快速，喜讯，闹，温暖，好事在眼前。",
+                "赤口": "疾病宫，兄弟宫，手术，口舌，官司，合同，小人，第三人，缺口。",
+                "小吉": "驿马宫，子女宫，代表钱财，变动，约定，逐渐变好，人缘好，桃花，雨水，溪流，酒，子女，赴约，合作。",
+                "空亡": "父母宫，福德宫，代表空缺，隔离，落空，失落，异地，没有消息，牢狱，妄想。"
+            };
+
+            document.getElementById('liurenResult').innerHTML = `
+                <h3>结果</h3>
+                <p>${palace1} (${elements[palace1]}，${yinYang[palace1]})</p>
+                <p>${palace2} (${elements[palace2]}，${yinYang[palace2]})</p>
+                <p>${palace3} (${elements[palace3]}，${yinYang[palace3]})</p>
+                ${relations ? `<h3>生克关系</h3>${relations}` : ""}
+                ${time ? `<h3>时辰比较</h3><p>${timeResult}</p>` : ""}
+                <h3>取象</h3>
+                <p>${palace1}：${meanings[palace1]}</p>
+                <p>${palace2}：${meanings[palace2]}</p>
+                <p>${palace3}：${meanings[palace3]}</p>
+            `;
+        }
+
+        // 获取六壬生克关系
+        function getLiurenRelations(palaces) {
+            let relationsHTML = "";
+            const arrows = {
+                "generate": "→",
+                "overcome": "↣"
+            };
+            const arrowStyles = {
+                "generate": "arrow generate",
+                "overcome": "arrow overcome"
+            };
+
+            for (let i = 0; i < palaces.length; i++) {
+                for (let j = 0; j < palaces.length; j++) {
+                    if (i !== j) {
+                        let el1 = palaces[i].element;
+                        let el2 = palaces[j].element;
+                        let relationType = getLiurenRelationType(el1, el2);
+                        if (relationType) {
+                            relationsHTML += `
+                                <div class="relation">
+                                    <span>${palaces[i].palace} (${el1})</span>
+                                    <span class="${arrowStyles[relationType]}">${arrows[relationType]}</span>
+                                    <span>${palaces[j].palace} (${el2})</span>
+                                    <span>（${relationType === 'generate' ? '生' : '克'}）</span>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+            }
+            return relationsHTML;
+        }
+
+        function getLiurenRelationType(el1, el2) {
+            const generate = {
+                "金": "水", "水": "木", "木": "火", "火": "土", "土": "金"
+            };
+            const overcome = {
+                "金": "木", "木": "土", "土": "水", "水": "火", "火": "金"
+            };
+
+            if (generate[el1] === el2) return 'generate';
+            if (overcome[el1] === el2) return 'overcome';
+            return null;
+        }
+
+        function compareLiurenWithTime(element3, yinYang3, palace3, timeElement, timeYinYang) {
+            if (!timeElement || !timeYinYang) return '';
+
+            const generate = {
+                "金": "水", "水": "木", "木": "火", "火": "土", "土": "金"
+            };
+            const overcome = {
+                "": "木", "木": "土", "土": "水", "水": "火", "火": "金"
+            };
+
+            if (generate[timeElement] === element3) {
+                return `时辰五行${timeElement}生${element3}，利，贵人。`;
+            } else if (generate[element3] === timeElement) {
+                return `时辰五行${timeElement}被${element3}生，不利，付出多。`;
+            } else if (overcome[timeElement] === element3) {
+                return `时辰五行${timeElement}克${element3}，不利，难。`;
+            } else if (overcome[element3] === timeElement) {
+                return `时辰五行${timeElement}被${element3}克，利，积极应对。`;
+            } else if (timeElement === element3) {
+                if (yinYang3 === timeYinYang) {
+                    return `时辰五行与第三宫五行相同，阴阳相同，不利，阻力。`;
+                } else {
+                    return `时   五行与第三宫五行相同，阴阳不同，利，助力。`;
+                }
+            }
+            return `时辰五行${timeElement}与${element3}无生克关系。`;
+        }
+
+        // 十二神批命相关函数
+        function toggleDestinyInput() {
+            const scale = document.getElementById('scale').value;
+            const extraInput = document.getElementById('extraInput');
+            extraInput.style.display = scale === '命运' ? 'none' : 'block';
+        }
+
+        function calculateDestiny() {
+            const tianGanInputs = [0,1,2,3].map(i => document.getElementById('tg' + i).value.trim());
+            const diZhiInputs = [0,1,2,3].map(i => document.getElementById('dz' + i).value.trim());
+            const scale = document.getElementById('scale').value;
+            let startDiZhi = '';
+            let headers = ['年柱', '月柱', '日柱', '时柱'];
+
+            if (scale === '命运') {
+                startDiZhi = tianGanToDiZhi[tianGanInputs[2]];
+                if (!startDiZhi) {
+                    alert('请输入正确的日的天干以进行转换。');
+                    return;
+                }
+            } else {
+                startDiZhi = document.getElementById('extraBranch').value.trim();
+                if (!diZhiSequence.includes(startDiZhi)) {
+                    alert('请输入正确的运支或流年。');
+                    return;
+                }
+                headers = scale === '大运' ? ['2年', '3年', '3年', '2年'] : ['春', '夏', '秋', '冬'];
+            }
+
+            displayDestinyResult(startDiZhi, headers, tianGanInputs, diZhiInputs);
+        }
+
+        function displayDestinyResult(startDiZhi, headers, tianGanInputs, diZhiInputs) {
+            const index = diZhiSequence.indexOf(startDiZhi);
+            const numberMapping = {};
+            for (let i = 0; i < diZhiSequence.length; i++) {
+                numberMapping[diZhiSequence[(index + i) % 12]] = i + 1;
+            }
+
+            let resultHtml = '<h3>结果：</h3><table class="result-table"><tr><th></th>';
+            headers.forEach(header => resultHtml += `<th>${header}</th>`);
+            resultHtml += '</tr>';
+
+            // 显示转换后的地支
+            const convertedDiZhi = tianGanInputs.map(tg => tianGanToDiZhi[tg] || '');
+            resultHtml += '<tr><td>地支</td>';
+            convertedDiZhi.forEach((dz, i) => {
+                let note = '';
+                if ((i === 0 || i === 2) && ['申', '酉', '午', '未'].includes(dz)) {
+                    note = '<span class="note">（空亡）</span>';
+                }
+                resultHtml += `<td>${dz}${note}</td>`;
+            });
+            resultHtml += '</tr><tr><td>数字</td>';
+            convertedDiZhi.forEach(dz => {
+                const num = numberMapping[dz];
+                resultHtml += `<td>${num !== undefined ? num : ''}</td>`;
+            });
+            resultHtml += '</tr>';
+
+            // 显示原始地支
+            resultHtml += '<tr><td>地支</td>';
+            diZhiInputs.forEach((dz, i) => {
+                let note = '';
+                if ((i === 0 || i === 2) && ['申', '酉', '午', '未'].includes(dz)) {
+                    note = '<span class="note">（空亡）</span>';
+                }
+                resultHtml += `<td>${dz}${note}</td>`;
+            });
+            resultHtml += '</tr><tr><td>数字</td>';
+            diZhiInputs.forEach(dz => {
+                const num = numberMapping[dz];
+                resultHtml += `<td>${num !== undefined ? num : ''}</td>`;
+            });
+            resultHtml += '</tr></table>';
+
+            document.getElementById('destinyResult').innerHTML = resultHtml;
+        }
+
+        // 初始化显示第一个标签页
+        const firstTab = document.querySelector('.nav-tab');
+        const firstTabId = firstTab.getAttribute('data-tab');
+        firstTab.classList.add('active');
+        document.getElementById(firstTabId).classList.add('active');
+
+        // 在script标签内，其他常量定义的地方添加
+        const timeElements = {
+            "子": { element: "水", yinYang: "阳" },
+            "丑": { element: "土", yinYang: "阴" },
+            "寅": { element: "木", yinYang: "阳" },
+            "卯": { element: "木", yinYang: "" },
+            "辰": { element: "土", yinYang: "阳" },
+            "巳": { element: "火", yinYang: "阴" },
+            "午": { element: "火", yinYang: "阳" },
+            "未": { element: "土", yinYang: "阴" },
+            "申": { element: "金", yinYang: "阳" },
+            "酉": { element: "金", yinYang: "阴" },
+            "戌": { element: "土", yinYang: "阳" },
+            "亥": { element: "水", yinYang: "阴" }
+        };
+
+        // 在functionSelect的onchange事件中添加
+        document.getElementById('functionSelect').addEventListener('change', function() {
+            const sections = document.querySelectorAll('.magnetic-field .section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            const selectedValue = this.value;
+            if (selectedValue) {
+                const selectedSection = document.getElementById(selectedValue + 'Section');
+                if (selectedSection) {
+                    selectedSection.style.display = 'block';
+                }
+            }
+        });
+
+        // 获取卦的爻
+        function getTrigramYao(trigram) {
+            const trigrams = {
+                '乾': ['阳', '阳', '阳'],
+                '兑': ['阳', '阳', '阴'],
+                '离': ['阳', '阴', '阳'],
+                '震': ['阳', '阴', '阴'],
+                '巽': ['阴', '阳', '阳'],
+                '坎': ['阴', '阳', '阴'],
+                '艮': ['阴', '阴', '阳'],
+                '坤': ['阴', '阴', '阴']
+            };
+            return trigrams[trigram];
+        }
+
+        // 比较两组爻
+        function compareYao(yao1, yao2) {
+            let differences = [];
+            for (let i = 0; i < 3; i++) {
+                if (yao1[i] !== yao2[i]) {
+                    differences.push(i + 1);
+                }
+            }
+            return differences;
+        }
+
+        // 获取磁场类型
+        function getMagneticFieldType(differences) {
+            if (differences.length === 0) {
+                return '辅弼磁场';
+            } else if (differences.length === 3) {
+                return '延年磁场';
+            } else if (differences.length === 1) {
+                if (differences[0] === 1) return '祸害磁场';
+                if (differences[0] === 2) return '绝命磁场';
+                if (differences[0] === 3) return '升气磁场';
+            } else if (differences.length === 2) {
+                if (differences.includes(2) && differences.includes(3)) return '五鬼磁场';
+                if (differences.includes(1) && differences.includes(2)) return '天医磁场';
+                if (differences.includes(1) && differences.includes(3)) return '陆煞磁场';
+            }
+            return '未知磁场';
+        }
+
+        // 获取磁场描述
+        function getMagneticFieldDescription(type) {
+            const descriptions = {
+                '祸害磁场': `亥卯未，找乙木位置破。
+1：小孩住在祸害位对眼睛不好。
+2：单身孤寡住在祸害位，可以延年益寿。
+3：住在祸害磁场的人，喜欢抱怨，爱钻牛角尖，铁齿伶牙，心服口不服，嘴硬但内心比较脆弱。
+4：刚结婚的夫妇，总是吵架，容易离婚，住在祸害位置也会很容易出现不孕不育，或者说生出来的孩子，很容易聋哑伤残。`,
+                
+                '绝命磁场': `巳酉丑，找辛金位置破。
+1：住在绝命磁场的人，情绪或者事业，很容易大起大落，出现极度乐观和极度悲观的两极分化状态。
+2：住在绝命磁场的人，心肠都比较软，重情重义，但是遇事很执着，自以为是，好要面子。
+3：在这个磁场住的时间长了，会有投机，侥幸的心理，所以很容易投资失败，留不住财。
+4：在这个磁场住的人，对婚姻来讲，婚后家庭的协调力，沟通力会比较差。
+5：住在绝命磁场的人容易得的疾病是，痛风，糖尿病，妇科疾病，还有肝胆肾结石。
+6：破财，罚单，交通事故`,
+
+                '升气磁场': '此为吉位，利于家庭和睦，事业发展。',
+
+                '五鬼磁场': `寅午戌，找丁火位置破。
+1：容易感召阴性众生。住在五鬼磁场的人，有宗教心，有偏财运，但是财来财去，留不住。
+2：住在五鬼磁场的人，阴沉，疑心重，城府很深，戒备心很强，遇事喜欢走极端，所以很容易有血光之灾。
+3：婚姻方面容易导致婚外遇，出轨，不信任对方。住在这个磁场的女人容易暴躁，发火，也不容易沟通。
+4：对于健康，住在五鬼磁场的人，很容易出现心脏疾病，意外手术，这个磁场一旦发病，都是要命的大病。`,
+
+                '天医磁场': '此为吉位，利于健康养生，化解疾病。',
+
+                '陆煞磁场': `申子辰，找癸水位置破。
+1：住在陆煞的男孩容易拉肚子，女孩容易发烧，住在陆煞位的女人，遇事犹豫不决，斤斤计较，平时挺温柔，住在这个位置，会慢慢变成女汉子。
+2：夫妇住在这个位置，如果犯桃花的话，身体不会有问题，如果不犯桃花男的会有肠胃疾病，女的会有妇科疾病。
+3：没有谈对象的人，可以住在陆煞位，谈了对象赶快搬走，因为这个位置只开花，不结果。
+4：陆煞磁场对人健康的影响，肠胃疾病、妇科疾病、抑郁症，都是陆煞磁场惹的祸。`,
+
+                '延年磁场': '此为吉位，利于健康长寿，事业稳定。',
+
+                '辅弼磁场': '此为吉位，利于人际关系，贵人相助。'
+            };
+            return descriptions[type] || '未知磁场类型';
+        }
+
+        // 获取天干地支
+        function getGanZhi(date) {
+            const baseDate = new Date(1900, 0, 31); // 1900年1月31日为甲辰日
+            const daysDiff = Math.floor((date - baseDate) / (24 * 60 * 60 * 1000));
+            const ganArr = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+            const dayGan = ganArr[daysDiff % 10];
+            return { dayGan };
+        }
+
+        // 根据天干获取方位
+        function getPositionByGan(gan) {
+            const positions = {
+                '甲': '震（东方）',
+                '乙': '离（南方）',
+                '丙': '坤（西南）',
+                '丁': '乾（西北）',
+                '戊': '坎（北方）',
+                '己': '巽（东南）',
+                '庚': '兑（西方）',
+                '辛': '坤（西南）',
+                '壬': '艮（东北）',
+                '癸': '艮（东北）'
+            };
+            return positions[gan] || '未知方位';
+        }
+
+        // 根据天干判断谁拿走的
+        function getWhoTookByGan(gan) {
+            const whoTook = {
+                '甲': '男人拿的', '己': '男人拿的',
+                '乙': '女人拿的', '庚': '女人拿的',
+                '丙': '孩童拿的', '辛': '孩童拿的',
+                '丁': '亲戚拿的', '壬': '亲戚拿的',
+                '戊': '在家里的', '癸': '在家里的'
+            };
+            return whoTook[gan] || '未知';
+        }
+
+        // 根据时辰判断物品在何处
+        function getWhereIsItByTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            const timePeriod = getTimePeriod(hour);
+            const locations = {
+                '子': '物品在路旁', '卯': '物品在路旁',
+                '午': '物品在路旁', '酉': '物品在路旁',
+                '丑': '在身边', '辰': '在身边',
+                '未': '在身边', '戌': '在身边',
+                '寅': '被别人拿走了', '巳': '被别人拿走了',
+                '申': '被别人拿走了', '亥': '被别人拿走了'
+            };
+            return locations[timePeriod] || '未知位置';
+        }
+
+        // 获取时辰
+        function getTimePeriod(hour) {
+            const periods = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+            return periods[Math.floor((hour + 1) % 24 / 2)];
+        }
+
+        // 根据天干判断距离
+        function getDistanceByGan(gan) {
+            const distances = {
+                '甲': '距离失主五里地以内', '己': '距离失主五里地以内',
+                '乙': '距离失主千里', '庚': '距离失主千里',
+                '丙': '距离整十里', '辛': '距离整十里',
+                '丁': '距离三内', '壬': '距离三里内',
+                '戊': '就在身边', '癸': '就在身边'
+            };
+            return distances[gan] || '未知距离';
+        }
+
+        // 获取卦宫五行
+        function getPalaceElement(direction) {
+            const elements = {
+                '南方': '火',
+                '东南': '木',
+                '东方': '木',
+                '东北': '土',
+                '北方': '水',
+                '西北': '金',
+                '西方': '金',
+                '西南': '土'
+            };
+            return elements[direction];
+        }
+
+        // 获取物品五行
+        function getObjectElement(objectType) {
+            const elements = {
+                '绿长直木': '木',
+                '红尖形火': '火',
+                '蓝弯曲水': '水',
+                '黑金圆形金': '金',
+                '白黄方形土': '土',
+                '钟表': '金',
+                '剪刀': '金',
+                '钉子': '金',
+                '绿植': '木',
+                '棍棒': '木',
+                '鱼缸': '水',
+                '福字': '水',
+                '寿字': '水',
+                '打火机': '火',
+                '厨灶': '火',
+                '电器': '火',
+                '桌子': '土',
+                '床': '土',
+                '柜子': '土'
+            };
+            return elements[objectType];
+        }
+
+        // 获取落宫断法结果
+        function getLuoGongFortune(objectElement, palaceElement) {
+            if (objectElement === palaceElement) {
+                return '贵人相助';
+            }
+            
+            const generating = {
+                '木': '火', '火': '土', '土': '金',
+                '金': '水', '水': '木'
+            };
+            
+            const controlling = {
+                '木': '土', '土': '水', '水': '火',
+                '火': '金', '金': '木'
+            };
+
+            if (generating[objectElement] === palaceElement) {
+                return '进财';
+            } else if (generating[palaceElement] === objectElement) {
+                return '破财';
+            } else if (controlling[objectElement] === palaceElement) {
+                return '招灾、不舒服、压力大，车祸疾病';
+            } else if (controlling[palaceElement] === objectElement) {
+                return '辛苦得财';
+            }
+            
+            return '未知';
+        }
+
+        // 在script标签内修改initColorOptions函数的调用方式
+
+        // 将原来的DOMContentLoaded事件监听器修改为：
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化颜色选项
+            const colorFiveElements = {
+                '青': '水', '蓝': '水', '棕': '水',
+                '白': '土', '黄': '土', '灰': '土',
+                '紫': '木', '绿': '木',
+                '粉': '火', '红': '火',
+                '金': '金', '黑': '金',
+                '橙': '火', '银': '金',
+                '咖啡色': '土', '天蓝': '水',
+                '草绿': '木', '玫红': '火'
+            };
+
+            function initColorOptions() {
+                const fontColorSelect = document.getElementById('fontColor');
+                const bgColorSelect = document.getElementById('bgColor');
+
+                // 清空现有选项
+                fontColorSelect.innerHTML = '<option value="">请选择</option>';
+                bgColorSelect.innerHTML = '<option value="">请选择</option>';
+
+                // 添加颜色选项
+                for (let color in colorFiveElements) {
+                    const option1 = new Option(`${color} (${colorFiveElements[color]})`, color);
+                    const option2 = new Option(`${color} (${colorFiveElements[color]})`, color);
+                    fontColorSelect.add(option1);
+                    bgColorSelect.add(option2);
+                }
+            }
+
+            // 初始化颜色选项
+            initColorOptions();
+            
+            // 监听店铺方向选择变化
+            document.getElementById('shopDirection').addEventListener('change', function() {
+                if (this.value === '') {
+                    document.getElementById('directionInfo').textContent = '';
+                    document.getElementById('countingInfo').textContent = '';
+                    return;
+                }
+                const yangGua = ['乾', '坎', '艮', '震'];
+                const yinGua = ['巽', '离', '坤', '兑'];
+                let info = '';
+                if (yangGua.includes(this.value)) {
+                    info = '阳卦，请从左向右数门店。';
+                    document.getElementById('countingInfo').textContent = '从左向右数';
+                } else if (yinGua.includes(this.value)) {
+                    info = '阴卦，请从右向左数门店。';
+                    document.getElementById('countingInfo').textContent = '从右向左数';
+                }
+                document.getElementById('directionInfo').textContent = info;
+            });
+        });
+
+        // 修改店铺凶吉计算函数
+        function calculateShopFortune() {
+            const direction = document.getElementById('shopDirection').value;
+            const shopNumber = parseInt(document.getElementById('shopNumber').value);
+            const zodiac = document.getElementById('ownerZodiac').value;
+            const fontColor = document.getElementById('fontColor').value;
+            const bgColor = document.getElementById('bgColor').value;
+
+            if (!direction) {
+                alert('请选择门口朝向');
+                return;
+            }
+
+            let resultHtml = '';
+
+            // 生肖相冲相破相穿判断
+            if (zodiac) {
+                const badDirections = getBadDirections(zodiac);
+                if (badDirections.includes(direction)) {
+                    resultHtml += `<p>不可选择的门口朝向：${badDirections.join('，')}</p>`;
+                }
+            }
+
+            // 店铺间数判断
+            if (isNaN(shopNumber)) {
+                // 没有选择间数，列出1-9间的吉利间数
+                resultHtml += '<p>可选择的吉利间数：</p>';
+                let goodNumbers = [];
+                for (let i = 1; i <= 9; i++) {
+                    const shopElement = getShopElement(i);
+                    const sittingElement = getSittingElement(direction);
+                    const fortune = getFortune(shopElement, sittingElement);
+                    if (fortune.includes('吉')) {
+                        goodNumbers.push(i);
+                    }
+                }
+                resultHtml += `<p>${goodNumbers.join('，')}间</p>`;
+            } else {
+                const shopElement = getShopElement(shopNumber);
+                const sittingElement = getSittingElement(direction);
+                const fortune = getFortune(shopElement, sittingElement);
+                resultHtml += `<p>店铺间数的五行为：${shopElement}</p>`;
+                resultHtml += `<p>坐山五行为：${sittingElement}</p>`;
+                resultHtml += `<p>吉凶判断：${fortune}</p>`;
+            }
+
+            // 字体颜色和背景颜色判断
+            if (fontColor || bgColor) {
+                const fontElement = colorFiveElements[fontColor];
+                const bgElement = colorFiveElements[bgColor];
+
+                if (!fontColor && bgElement) {
+                    // 推荐字体颜色
+                    const recommendedColors = getRecommendedColors(bgElement, true);
+                    resultHtml += `<p>推荐的字体颜色：${recommendedColors}</p>`;
+                } else if (!bgColor && fontElement) {
+                    // 推荐背景颜色
+                    const recommendedColors = getRecommendedColors(fontElement, false);
+                    resultHtml += `<p>推荐的背景颜色：${recommendedColors}</p>`;
+                } else if (fontElement && bgElement) {
+                    const colorFortune = getFortune(bgElement, fontElement);
+                    resultHtml += `<p>字体颜色的五行为：${fontElement}</p>`;
+                    resultHtml += `<p>背景颜色的五行为：${bgElement}</p>`;
+                    resultHtml += `<p>颜色吉凶判断：${colorFortune}</p>`;
+                }
+            }
+
+            document.getElementById('shopResult').innerHTML = resultHtml;
+        }
+
+        // 添加颜色五行映射
+        const colorFiveElements = {
+            '青': '水', '蓝': '水', '棕': '水',
+            '白': '土', '黄': '土', '灰': '土',
+            '紫': '木', '绿': '木',
+            '粉': '火', '红': '火',
+            '金': '金', '黑': '金',
+            '橙': '火', '银': '金',
+            '咖啡色': '土', '天蓝': '水',
+            '草绿': '木', '玫红': '火'
+        };
+
+        // 获取推荐颜色
+        function getRecommendedColors(element, isFont) {
+            const colors = [];
+            for (let color in colorFiveElements) {
+                if (isFont) {
+                    // 字体颜色应该生背景色
+                    if (wuxingRelation[colorFiveElements[color]].generate === element) {
+                        colors.push(color);
+                    }
+                } else {
+                    // 背景色应该克字体色
+                    if (wuxingRelation[colorFiveElements[color]].overcome === element) {
+                        colors.push(color);
+                    }
+                }
+            }
+            return colors.join('，');
+        }
+
+        // 获取店铺五行
+        function getShopElement(number) {
+            const mapping = {
+                1: '水', 6: '水',
+                2: '火', 7: '火',
+                3: '木', 8: '木',
+                4: '金', 9: '金',
+                5: '土', 0: '土'
+            };
+            return mapping[number % 10] || '未知';
+        }
+
+        // 获取坐山五行
+        function getSittingElement(direction) {
+            const mapping = {
+                '乾': '巽', '坎': '离', '艮': '坤', '震': '兑',
+                '巽': '乾', '离': '坎', '坤': '艮', '兑': '震'
+            };
+            const elementMapping = {
+                '乾': '金', '坎': '水', '艮': '土', '震': '木',
+                '巽': '木', '离': '火', '坤': '土', '兑': '金'
+            };
+            return elementMapping[mapping[direction]] || '未知';
+        }
+
+        // 获取生肖相冲方向
+        function getBadDirections(zodiac) {
+            const conflicts = {
+                '子': ['午', '卯', '丑'],
+                '丑': ['未', '午', '戌'],
+                '寅': ['申', '巳', '亥'],
+                '卯': ['酉', '子', '辰'],
+                '辰': ['戌', '丑', '卯'],
+                '巳': ['亥', '寅', '申'],
+                '午': ['子', '丑', '卯'],
+                '未': ['丑', '戌', '子'],
+                '申': ['寅', '巳', '亥'],
+                '酉': ['卯', '子', '辰'],
+                '戌': ['辰', '丑', '未'],
+                '亥': ['巳', '寅', '申']
+            };
+            return conflicts[zodiac] || [];
+        }
+
+        // 天干对应地支映射
+        const tianGanToDiZhi = {
+            '甲': '寅',
+            '乙': '卯',
+            '丙': '巳',
+            '丁': '午',
+            '戊': '戌',
+            '己': '丑',
+            '庚': '申',
+            '辛': '酉',
+            '壬': '亥',
+            '癸': '子'
+        };
+
+        // 地支序列
+        const diZhiSequence = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+        // 在script标签内添加以下函数
+
+        // 判断阳卦
+        function isYangTrigram(trigram) {
+            // 阳卦包括：乾（阳阳阳）、坎（阴阳阴）、艮（阴阴阳）、震（阳阴阴）
+            const yangTrigrams = ['阳阳阳', '阴阳阴', '阴阴阳', '阳阴阴'];
+            return yangTrigrams.includes(trigram);
+        }
+
+        // 计算前四世
+        function calculatePreviousLives(zodiacIndex, month, day, birthHourIndex, gender) {
+            const zodiacCycle = ['子鼠', '丑牛', '寅虎', '卯兔', '辰龙', '巳蛇', '午马', '未羊', '申猴', '酉鸡', '戌狗', '亥猪'];
+            const previousLives = [];
+            previousLivesBranches = [];
+            
+            // 第一世：出生年份的生肖
+            previousLives.push(zodiacCycle[zodiacIndex]);
+            previousLivesBranches.push(zodiacCycle[zodiacIndex].substring(0, 1));
+
+            let currentIndex = zodiacIndex;
+            if (gender === 'male') {
+                // 男性，顺序查找
+                currentIndex = mod(currentIndex + (month - 1), 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+
+                currentIndex = mod(currentIndex + (day - 1), 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+
+                currentIndex = mod(currentIndex + birthHourIndex, 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+            } else {
+                // 女性，逆序查找
+                currentIndex = mod(currentIndex - (month - 1), 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+
+                currentIndex = mod(currentIndex - (day - 1), 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+
+                currentIndex = mod(currentIndex - birthHourIndex, 12);
+                previousLives.push(zodiacCycle[currentIndex]);
+                previousLivesBranches.push(zodiacCycle[currentIndex].substring(0, 1));
+            }
+
+            return previousLives;
+        }
+
+        // 查找贵人数字
+        function findGuirenNumbers(nobleYearBranchIndex, guirenBranches) {
+            const numbers = [1,2,3,4,5,6,7,8,9];
+            let firstOccurrences = [];
+            let secondOccurrences = [];
+            let numberIndex = 0;
+            let branchIndex = nobleYearBranchIndex;
+            let foundCounts = {};
+
+            // 寻找第一次出现的贵人
+            while (firstOccurrences.length < guirenBranches.length) {
+                let currentBranch = branchList[branchIndex % 12];
+                let currentNumber = numbers[numberIndex % 9];
+                if (guirenBranches.includes(currentBranch) && !foundCounts[currentBranch]) {
+                    firstOccurrences.push(currentNumber);
+                    foundCounts[currentBranch] = 1;
+                }
+                branchIndex++;
+                numberIndex++;
+            }
+
+            // 寻找第二次出现的贵人
+            while (secondOccurrences.length < guirenBranches.length) {
+                let currentBranch = branchList[branchIndex % 12];
+                let currentNumber = numbers[numberIndex % 9];
+                if (guirenBranches.includes(currentBranch) && foundCounts[currentBranch] === 1) {
+                    secondOccurrences.push(currentNumber);
+                    foundCounts[currentBranch] = 2;
+                }
+                branchIndex++;
+                numberIndex++;
+            }
+
+            return { firstOccurrences, secondOccurrences };
+        }
+
+        // 更新生日计算结果
+        function updateBirthdayResult(age, birthHourCycle, zodiac, baZiNumbers, previousLives) {
+            elements.age.textContent = age;
+            elements.birthHourCycle.textContent = birthHourCycle;
+            elements.zodiac.textContent = zodiac;
+            elements.baZiNumbers.textContent = baZiNumbers.join(', ');
+            elements.previousLives.textContent = previousLives.join('，');
+
+            // 根据年龄范围选择体数字
+            const ageRange = elements.ageRange.value;
+            if (ageRange === "0-20") {
+                selectedNumber = baZiNumbers[0];
+            } else if (ageRange === "20-40") {
+                selectedNumber = baZiNumbers[1];
+            } else if (ageRange === "40-60") {
+                selectedNumber = baZiNumbers[2];
+            } else {
+                selectedNumber = baZiNumbers[baZiNumbers.length - 1];
+            }
+
+            // 获取体五行
+            selectedWuxing = numberToElementMap[selectedNumber.toString()];
+        }
+
+        // 在DOMContentLoaded事件中添加功能选择的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化颜色选项
+            initColorOptions();
+            
+            // 初始化功能选择
+            const functionSelect = document.getElementById('functionSelect');
+            if (functionSelect) {
+                functionSelect.addEventListener('change', showSelectedFunction);
+            }
+        });
+
+        // 磁场归藏计算
+        function calculateMagneticField() {
+            const doorDirection = document.getElementById('doorDirection').value;
+            const roomTrigram = document.getElementById('roomTrigram').value;
+
+            if (doorDirection === '' || roomTrigram === '') {
+                alert('请填写所有选项');
+                return;
+            }
+
+            const doorYao = getTrigramYao(doorDirection);
+            const roomYao = getTrigramYao(roomTrigram);
+            const differences = compareYao(doorYao, roomYao);
+            const resultType = getMagneticFieldType(differences);
+            const description = getMagneticFieldDescription(resultType);
+
+            document.getElementById('magneticResult').innerHTML = 
+                `<p><strong>结果：${resultType}</strong></p><p>${description}</p>`;
+        }
+
+        // 寻物计算
+        function calculateFindObject() {
+            const solarDate = document.getElementById('solarDate').value;
+            if (!solarDate) {
+                alert('请选择日期');
+                return;
+            }
+
+            const date = new Date(solarDate);
+            const ganzhi = getGanZhi(date);
+            const dayGan = ganzhi.dayGan;
+
+            const position = getPositionByGan(dayGan);
+            const whoTook = getWhoTookByGan(dayGan);
+            const whereIsIt = getWhereIsItByTime();
+            const distance = getDistanceByGan(dayGan);
+
+            document.getElementById('findObjectResult').innerHTML = `
+                <p>日干：${dayGan}</p>
+                <p>物品所在方位：${position}</p>
+                <p>谁拿走的：${whoTook}</p>
+                <p>现在何处：${whereIsIt}</p>
+                <p>距离远近：${distance}</p>
+            `;
+        }
+
+        // 落宫断法计算
+        function calculateLuoGong() {
+            const direction = document.getElementById('luoGongDirection').value;
+            const objectType = document.getElementById('objectType').value;
+
+            if (direction === '' || objectType === '') {
+                alert('请填写所有选项');
+                return;
+            }
+
+            const palaceElement = getPalaceElement(direction);
+            const objectElement = getObjectElement(objectType);
+            const fortune = getLuoGongFortune(objectElement, palaceElement);
+
+            document.getElementById('luoGongResult').innerHTML = `
+                <p>卦宫五行：${palaceElement}</p>
+                <p>物品五行：${objectElement}</p>
+                <p>结果：${fortune}</p>
+            `;
+        }
+
+        // 添加五行生克关系判断函数
+        function getFortune(element1, element2) {
+            if (element1 === element2) {
+                return '吉，贵人相助';
+            }
+            
+            const generating = {
+                '金': '水', '水': '木', '木': '火',
+                '火': '土', '土': '金'
+            };
+            
+            const controlling = {
+                '金': '木', '木': '土', '土': '水',
+                '水': '火', '火': '金'
+            };
+
+            if (generating[element1] === element2) {
+                return '吉，容易得财';
+            } else if (generating[element2] === element1) {
+                return '凶，容易破财';
+            } else if (controlling[element1] === element2) {
+                return '凶，容易招灾';
+            } else if (controlling[element2] === element1) {
+                return '吉，辛苦得财';
+            }
+            
+            return '未知';
+        }
+
+        // 在script标签内添加以下函数
+
+        // 查生男生女计算
+        function calculateGenderPrediction() {
+            const fatherAge = parseInt(document.getElementById('fatherAge').value);
+            const motherAge = parseInt(document.getElementById('motherAge').value);
+            const monthOption = document.getElementById('monthOption').value;
+
+            if (isNaN(fatherAge) || isNaN(motherAge) || monthOption === '') {
+                alert('请填写所有选项');
+                return;
+            }
+
+            const fatherYao = fatherAge % 2 === 0 ? '阴' : '阳';
+            const motherYao = motherAge % 2 === 0 ? '阴' : '阳';
+            let result = '';
+
+            if (monthOption === 'predict') {
+                const boyMonths = [];
+                const girlMonths = [];
+
+                for (let month = 1; month <= 12; month++) {
+                    const monthYao = month % 2 === 0 ? '阴' : '阳';
+                    // 从下到上：母亲爻（下，一爻），月份爻（二爻），父亲爻（上，三爻）
+                    const trigram = motherYao + monthYao + fatherYao;
+                    if (isYangTrigram(trigram)) {
+                        boyMonths.push(month);
+                    } else {
+                        girlMonths.push(month);
+                    }
+                }
+
+                result = `<p>生男孩的月份：${boyMonths.join('，')}月</p>
+                         <p>生女孩的月份：${girlMonths.join('，')}月</p>`;
+            } else {
+                const monthYao = monthOption === 'oddMonth' ? '阳' : '阴';
+                const trigram = motherYao + monthYao + fatherYao;
+                result = `<p>预测结果：${isYangTrigram(trigram) ? '男孩' : '女孩'}</p>`;
+            }
+
+            document.getElementById('genderResult').innerHTML = result;
+        }
+
+        // 判断阳卦
+        function isYangTrigram(trigram) {
+            // 阳卦包括：乾（阳阳阳）、坎（阴阳阴）、艮（阴阴阳）、震（阳阴阴）
+            const yangTrigrams = ['阳阳阳', '阴阳阴', '阴阴阳', '阳阴阴'];
+            return yangTrigrams.includes(trigram);
+        }
+
+        // 获取卦的爻
+        function getTrigramYao(trigram) {
+            const trigrams = {
+                '乾': ['阳', '阳', '阳'],
+                '兑': ['阳', '阳', '阴'],
+                '离': ['阳', '阴', '阳'],
+                '震': ['阳', '阴', '阴'],
+                '巽': ['阴', '阳', '阳'],
+                '坎': ['阴', '阳', '阴'],
+                '艮': ['阴', '阴', '阳'],
+                '坤': ['阴', '阴', '阴']
+            };
+            return trigrams[trigram];
+        }
+
+        // 比较两组爻
+        function compareYao(yao1, yao2) {
+            let differences = [];
+            for (let i = 0; i < 3; i++) {
+                if (yao1[i] !== yao2[i]) {
+                    differences.push(i + 1);
+                }
+            }
+            return differences;
+        }
+
+        // 获取磁场类型
+        function getMagneticFieldType(differences) {
+            if (differences.length === 0) {
+                return '辅弼磁场';
+            } else if (differences.length === 3) {
+                return '延年磁场';
+            } else if (differences.length === 1) {
+                if (differences[0] === 1) return '祸害磁场';
+                if (differences[0] === 2) return '绝命磁场';
+                if (differences[0] === 3) return '升气磁场';
+            } else if (differences.length === 2) {
+                if (differences.includes(2) && differences.includes(3)) return '五鬼磁场';
+                if (differences.includes(1) && differences.includes(2)) return '天医磁场';
+                if (differences.includes(1) && differences.includes(3)) return '陆煞磁场';
+            }
+            return '未知磁场';
+        }
+
+        // 获取磁场描述
+        function getMagneticFieldDescription(type) {
+            const descriptions = {
+                '祸害磁场': `亥卯未，找乙木位置破。
+1：小孩住在祸害位对眼睛不好。
+2：单身孤寡住在祸害位，可以延年益寿。
+3：住在祸害磁场的人，喜欢抱怨，爱钻牛角尖，铁齿伶牙，心服口不服，嘴硬但内心比较脆弱。
+4：刚结婚的夫妇，总是吵架，容易离婚，住在祸害位置也会很容易出现不孕不育，或者说生出来的孩子，很容易聋哑伤残。`,
+                
+                '绝命磁场': `巳酉丑，找辛金位置破。
+1：住在绝命磁场的人，情绪或者事业，很容易大起大落，出现极度乐观和极度悲观的两极分化状态。
+2：住在绝命磁场的人，心肠都比较软，重情重义，但是遇事很执着，自以为是，好要面子。
+3：在这个磁场住的时间长了，会有投机，侥幸的心理，所以很容易投资失败，留不住财。
+4：在这个磁场住的人，对婚姻来讲，婚后家庭的协调力，沟通力会比较差。
+5：住在绝命磁场的人容易得的疾病是，痛风，糖尿病，妇科疾病，还有肝胆肾结石。
+6：破财，罚单，交通事故`,
+
+                '升气磁场': '此为吉位，利于家庭和睦，事业发展。',
+
+                '五鬼磁场': `寅午戌，找丁火位置破。
+1：容易感召阴性众生。住在五鬼磁场的人，有宗教心，有偏财运，但是财来财去，留不住。
+2：住在五鬼磁场的人，阴沉，疑心重，城府很深，戒备心很强，遇事喜欢走极端，所以很容易有血光之灾。
+3：婚姻方面容易导致婚外遇，出轨，不信任对方。住在这个磁场的女人容易暴躁，发火，也不容易沟通。
+4：对于健康，住在五鬼磁场的人，很容易出现心脏疾病，意外手术，这个磁场一旦发病，都是要命的大病。`,
+
+                '天医磁场': '此为吉位，利于健康养生，化解疾病。',
+
+                '陆煞磁场': `申子辰，找癸水位置破。
+1：住在陆煞的男孩容易拉肚子，女孩容易发烧，住在陆煞位的女人，遇事犹豫不决，斤斤计较，平时挺温柔，住在这个位置，会慢慢变成女汉子。
+2：夫妇住在这个位置，如果犯桃花的话，身体不会有问题，如果不犯桃花男的会有肠胃疾病，女的会有妇科疾病。
+3：没有谈对象的人，可以住在陆煞位，谈了对象赶快搬走，因为这个位置只开花，不结果。
+4：陆煞磁场对人健康的影响，肠胃疾病、妇科疾病、抑郁症，都是陆煞磁场惹的祸。`,
+
+                '延年磁场': '此为吉位，利于健康长寿，事业稳定。',
+
+                '辅弼磁场': '此为吉位，利于人际关系，贵人相助。'
+            };
+            return descriptions[type] || '未知磁场类型';
+        }
+    </script>
+</body>
+</html>
