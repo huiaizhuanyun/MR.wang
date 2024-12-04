@@ -97,7 +97,6 @@
         const heavenlyStems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
         const earthlyBranches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
         const zodiacs = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
-        const monthsEarthlyBranches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
         const unsuitableDays = [1,3,5,7,9,13,14,15,17,18,22,23,25,27];
         const excludeDaysByMonth = {
             1: [13],
@@ -132,12 +131,6 @@
             '子': '正北', '丑': '东北', '寅': '东北', '卯': '正东', '辰': '东南', '巳': '东南',
             '午': '正南', '未': '西南', '申': '西南', '酉': '正西', '戌': '西北', '亥': '西北'
         };
-        const seasons = {
-            '春': ['立春', '立夏'],
-            '夏': ['立夏', '立秋'],
-            '秋': ['立秋', '立冬'],
-            '冬': ['立冬', '立春']
-        };
 
         // 计算函数
         function calculate() {
@@ -168,7 +161,7 @@
                 const unsuitableDates = getUnsuitableDates(weddingYear, maleBirthDate, femaleBirthDate, maleFatherBirthDate, maleMotherBirthDate, femaleFatherBirthDate, femaleMotherBirthDate, maleZodiac, femaleZodiac);
 
                 // 计算适合的日子
-                const suitableDates = getSuitableDates(weddingYear, unsuitableDates, femaleZodiac);
+                const suitableDates = getSuitableDates(unsuitableDates, femaleZodiac);
 
                 // 如果没有合适的日期
                 if (suitableDates.length === 0) {
@@ -219,14 +212,14 @@
             });
 
             // 排除三月、七月、九月（农历）
-            dates = dates.filter(date => ![3,7,9].includes(date.lunarDate.getMonth() + 1));
+            dates = dates.filter(date => ![3,7,9].includes(date.lunarDate.getMonthInChinese()));
 
             // 排除每月的不吉利日子
             dates = dates.filter(date => !unsuitableDays.includes(date.lunarDate.getDay()));
 
             // 排除特定日期
             dates = dates.filter(date => {
-                const lunarMonth = date.lunarDate.getMonth() + 1;
+                const lunarMonth = date.lunarDate.getMonthInChinese();
                 const excludeDays = excludeDaysByMonth[lunarMonth];
                 return !excludeDays || !excludeDays.includes(date.lunarDate.getDay());
             });
@@ -271,7 +264,7 @@
 
             // 排除特定月份的特定地支日子
             dates = dates.filter(date => {
-                const month = date.lunarDate.getMonth() + 1;
+                const month = date.lunarDate.getMonth();
                 const dayBranch = getDayEarthlyBranch(date.solarDate);
                 if ([1,4,7,10].includes(month) && dayBranch === '酉') return false;
                 if ([2,5,8,11].includes(month) && dayBranch === '巳') return false;
@@ -283,15 +276,15 @@
         }
 
         // 获取适合的日子
-        function getSuitableDates(year, dates, femaleZodiac) {
+        function getSuitableDates(dates, femaleZodiac) {
             // 选择与女方生肖相合的日子
             const suitableDates = dates.filter(date => {
                 const dayZodiac = getDayZodiac(date.solarDate);
                 return threeHarmony[femaleZodiac].includes(dayZodiac) || sixHarmony[femaleZodiac] === dayZodiac;
             });
 
-            // 只取前三个吉日
-            return suitableDates.slice(0, 3);
+            // 返回所有吉日，不再限制数量
+            return suitableDates;
         }
 
         // 显示结果
@@ -355,7 +348,7 @@
         // 获取某日的地支
         function getDayEarthlyBranch(date) {
             const lunar = Lunar.fromDate(date);
-            return lunar.getDayBranch();
+            return lunar.getDayZhi();
         }
 
         // 获取某日的天干地支
@@ -415,12 +408,11 @@
         function calculateSolarTerms(year) {
             const solarTerms = {};
             const lunarYear = LunarYear.fromYear(year);
-            const jieQiMap = lunarYear.getJieQiTable();
             const terms = ['立春', '立夏', '立秋', '立冬'];
             terms.forEach(term => {
-                const solar = jieQiMap[term];
-                if (solar) {
-                    solarTerms[term] = formatDate(solar.getSolar().toDate());
+                const jieQi = lunarYear.getJieQiSolar(term);
+                if (jieQi) {
+                    solarTerms[term] = formatDate(jieQi.toDate());
                 }
             });
             return solarTerms;
@@ -460,3 +452,4 @@
     </script>
 </body>
 </html>
+
