@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>结婚吉时计算器</title>
+    <!-- 添加 favicon，防止浏览器报错 -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="date"], input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .result-item {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        .error-message {
+            color: red;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>结婚吉时计算器</h1>
+        <form id="weddingForm">
+            <h2>新郎新娘信息</h2>
+            <label>新郎出生日期（阳历）:
+                <input type="date" id="maleBirthDate">
+            </label>
+            <label>新娘出生日期（阳历）:
+                <input type="date" id="femaleBirthDate">
+            </label>
+            <h2>父母生日（阳历）</h2>
+            <label>新郎父亲生日:
+                <input type="date" id="maleFatherBirthDate">
+            </label>
+            <label>新郎母亲生日:
+                <input type="date" id="maleMotherBirthDate">
+            </label>
+            <label>新娘父亲生日:
+                <input type="date" id="femaleFatherBirthDate">
+            </label>
+            <label>新娘母亲生日:
+                <input type="date" id="femaleMotherBirthDate">
+            </label>
+            <h2>结婚年份</h2>
+            <label>计划结婚年份:
+                <input type="number" id="weddingYear" min="2020" max="2040" value="2024">
+            </label>
+            <button type="button" onclick="calculate()">计算吉日</button>
+        </form>
+        <div id="error" class="error-message"></div>
+        <div class="results" id="results"></div>
+        <div class="info" id="info"></div>
+    </div>
+
+    <!-- 引入准确的农历和天干地支计算库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.6.13/lunar.min.js"></script>
+
+    <script>
+        // 定义天干、地支、生肖等数据
+        const heavenlyStems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+        const earthlyBranches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+        const zodiacs = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+        const monthsEarthlyBranches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+        const unsuitableDays = [1,3,5,7,9,13,14,15,17,18,22,23,25,27];
+        const excludeDaysByMonth = {
+            1: [13],
+            2: [11],
+            3: [9],
+            4: [7],
+            5: [5],
+            6: [3],
+            7: [29],
+            11: [21],
+            12: [19]
+        };
+        const conflictZodiacs = {
+            '鼠': '马', '牛': '羊', '虎': '猴', '兔': '鸡', '龙': '狗', '蛇': '猪',
+            '马': '鼠', '羊': '牛', '猴': '虎', '鸡': '兔', '狗': '龙', '猪': '蛇'
+        };
+        const wearZodiacs = {
+            '猴': '猪', '鼠': '羊', '牛': '马', '虎': '蛇', '兔': '辰', '鸡': '戌',
+            '猪': '猴', '羊': '鼠', '马': '牛', '蛇': '虎', '辰': '兔', '戌': '鸡'
+        };
+        const threeHarmony = {
+            '猴': ['鼠','龙'], '鼠': ['猴','龙'], '龙': ['猴','鼠'],
+            '虎': ['马','狗'], '马': ['虎','狗'], '狗': ['虎','马'],
+            '蛇': ['鸡','牛'], '鸡': ['蛇','牛'], '牛': ['蛇','鸡'],
+            '猪': ['兔','羊'], '兔': ['猪','羊'], '羊': ['猪','兔']
+        };
+        const sixHarmony = {
+            '鼠': '牛', '牛': '鼠', '虎': '猪', '猪': '虎', '兔': '狗', '狗': '兔',
+            '龙': '鸡', '鸡': '龙', '蛇': '猴', '猴': '蛇', '马': '羊', '羊': '马'
+        };
+        const directions = {
+            '子': '正北', '丑': '东北', '寅': '东北', '卯': '正东', '辰': '东南', '巳': '东南',
+            '午': '正南', '未': '西南', '申': '西南', '酉': '正西', '戌': '西北', '亥': '西北'
+        };
+        const seasons = {
+            '春': ['立春', '立夏'],
+            '夏': ['立夏', '立秋'],
+            '秋': ['立秋', '立冬'],
+            '冬': ['立冬', '立春']
+        };
+
+        // 计算函数
+        function calculate() {
+            document.getElementById('error').innerText = ''; // 清空错误信息
+            try {
+                const maleBirthDate = document.getElementById('maleBirthDate').value;
+                const femaleBirthDate = document.getElementById('femaleBirthDate').value;
+                const maleFatherBirthDate = document.getElementById('maleFatherBirthDate').value;
+                const maleMotherBirthDate = document.getElementById('maleMotherBirthDate').value;
+                const femaleFatherBirthDate = document.getElementById('femaleFatherBirthDate').value;
+                const femaleMotherBirthDate = document.getElementById('femaleMotherBirthDate').value;
+                const weddingYear = parseInt(document.getElementById('weddingYear').value);
+
+                if (!maleBirthDate || !femaleBirthDate || !weddingYear) {
+                    alert('请填写所有必填项。');
+                    return;
+                }
+
+                // 获取生肖
+                const maleZodiac = getZodiac(maleBirthDate);
+                const femaleZodiac = getZodiac(femaleBirthDate);
+
+                // 获取冲、穿生肖
+                const conflictZodiac = conflictZodiacs[femaleZodiac];
+                const wearZodiac = wearZodiacs[femaleZodiac];
+
+                // 计算不适合的日子
+                const unsuitableDates = getUnsuitableDates(weddingYear, maleBirthDate, femaleBirthDate, maleFatherBirthDate, maleMotherBirthDate, femaleFatherBirthDate, femaleMotherBirthDate, maleZodiac, femaleZodiac);
+
+                // 计算适合的日子
+                const suitableDates = getSuitableDates(weddingYear, unsuitableDates, femaleZodiac);
+
+                // 如果没有合适的日期
+                if (suitableDates.length === 0) {
+                    document.getElementById('results').innerHTML = '<p>没有找到合适的结婚日期。</p>';
+                    return;
+                }
+
+                // 显示结果
+                displayResults(suitableDates, femaleBirthDate, femaleZodiac);
+
+                // 计算立春、立夏、立秋、立冬日期
+                const solarTerms = calculateSolarTerms(weddingYear);
+
+                // 显示年份信息
+                displayYearInfo(weddingYear, solarTerms);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('error').innerText = '发生错误：' + error.message;
+            }
+        }
+
+        // 获取生肖函数
+        function getZodiac(dateStr) {
+            const date = new Date(dateStr);
+            const lunar = Lunar.fromDate(date);
+            return lunar.getYearShengXiao();
+        }
+
+        // 获取不适合的日子
+        function getUnsuitableDates(year, maleBirthDate, femaleBirthDate, maleFatherBirthDate, maleMotherBirthDate, femaleFatherBirthDate, femaleMotherBirthDate, maleZodiac, femaleZodiac) {
+            let dates = [];
+
+            // 生成全年日期
+            const startDate = new Date(year, 0, 1);
+            const endDate = new Date(year, 11, 31);
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                const lunar = Lunar.fromDate(new Date(d));
+                dates.push({
+                    solarDate: new Date(d),
+                    lunarDate: lunar
+                });
+            }
+
+            // 排除相冲、相穿的日子
+            dates = dates.filter(date => {
+                const dayZodiac = getDayZodiac(date.solarDate);
+                return dayZodiac !== conflictZodiacs[femaleZodiac] && dayZodiac !== wearZodiacs[femaleZodiac];
+            });
+
+            // 排除三月、七月、九月（农历）
+            dates = dates.filter(date => ![3,7,9].includes(date.lunarDate.getMonth() + 1));
+
+            // 排除每月的不吉利日子
+            dates = dates.filter(date => !unsuitableDays.includes(date.lunarDate.getDay()));
+
+            // 排除特定日期
+            dates = dates.filter(date => {
+                const lunarMonth = date.lunarDate.getMonth() + 1;
+                const excludeDays = excludeDaysByMonth[lunarMonth];
+                return !excludeDays || !excludeDays.includes(date.lunarDate.getDay());
+            });
+
+            // 排除父母生日
+            const parentBirthDates = [maleFatherBirthDate, maleMotherBirthDate, femaleFatherBirthDate, femaleMotherBirthDate];
+            dates = dates.filter(date => {
+                const dateStr = formatDate(date.solarDate);
+                return !parentBirthDates.includes(dateStr);
+            });
+
+            // 排除四季前一天
+            const solarTerms = calculateSolarTerms(year);
+            const excludeDates = [
+                subtractDate(solarTerms['立春'], 1),
+                subtractDate(solarTerms['立夏'], 1),
+                subtractDate(solarTerms['立秋'], 1),
+                subtractDate(solarTerms['立冬'], 1)
+            ];
+            dates = dates.filter(date => {
+                const dateStr = formatDate(date.solarDate);
+                return !excludeDates.includes(dateStr);
+            });
+
+            // 排除特定节气的日子
+            dates = dates.filter(date => {
+                const season = getSeason(date.solarDate);
+                const dayBranch = getDayEarthlyBranch(date.solarDate);
+                if (season === '春' && dayBranch === '辰') return false;
+                if (season === '夏' && dayBranch === '未') return false;
+                if (season === '秋' && dayBranch === '戌') return false;
+                if (season === '冬' && dayBranch === '丑') return false;
+                return true;
+            });
+
+            // 排除特定天干地支的日子
+            dates = dates.filter(date => {
+                const dayStemBranch = getDayHeavenlyStemEarthlyBranch(date.solarDate);
+                const excludeStemBranches = ['甲寅','庚申','丁未','己未'];
+                return !excludeStemBranches.includes(dayStemBranch);
+            });
+
+            // 排除特定月份的特定地支日子
+            dates = dates.filter(date => {
+                const month = date.lunarDate.getMonth() + 1;
+                const dayBranch = getDayEarthlyBranch(date.solarDate);
+                if ([1,4,7,10].includes(month) && dayBranch === '酉') return false;
+                if ([2,5,8,11].includes(month) && dayBranch === '巳') return false;
+                if ([6,12].includes(month) && dayBranch === '丑') return false;
+                return true;
+            });
+
+            return dates;
+        }
+
+        // 获取适合的日子
+        function getSuitableDates(year, dates, femaleZodiac) {
+            // 选择与女方生肖相合的日子
+            const suitableDates = dates.filter(date => {
+                const dayZodiac = getDayZodiac(date.solarDate);
+                return threeHarmony[femaleZodiac].includes(dayZodiac) || sixHarmony[femaleZodiac] === dayZodiac;
+            });
+
+            // 只取前三个吉日
+            return suitableDates.slice(0, 3);
+        }
+
+        // 显示结果
+        function displayResults(dates, femaleBirthDate, femaleZodiac) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            dates.forEach((dateObj, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+
+                const date = dateObj.solarDate;
+                const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+                resultItem.innerHTML = `<h3>吉日 ${index + 1}: ${dateStr}</h3>`;
+
+                // 计算吉时
+                const auspiciousTimes = getAuspiciousTimes(date);
+
+                // 新娘上车面向方向
+                const brideBirthDayBranch = getDayEarthlyBranch(new Date(femaleBirthDate));
+                const oppositeDirection = getOppositeDirection(brideBirthDayBranch);
+
+                // 下车面向方向（当天喜神方向）
+                const arrivalDirection = getLuckyDirection(date);
+
+                // 新娘下车时需要回避的属相
+                const avoidZodiac = conflictZodiacs[brideBirthDayBranch];
+
+                // 不得参与伴郎伴娘和送迎亲的属相
+                const nextZodiac = getNextZodiac(femaleZodiac);
+                const forbiddenZodiacs = threeHarmony[nextZodiac];
+
+                resultItem.innerHTML += `
+                    <p><strong>吉时:</strong> ${auspiciousTimes.join('、')}</p>
+                    <p><strong>新娘上车面向方向:</strong> ${oppositeDirection}</p>
+                    <p><strong>新娘下车面向方向:</strong> ${arrivalDirection}</p>
+                    <p><strong>新娘下车时需要回避的属相:</strong> ${avoidZodiac}</p>
+                    <p><strong>不得参与伴郎伴娘和送迎亲的属相:</strong> ${forbiddenZodiacs.join('、')}</p>
+                `;
+
+                resultsDiv.appendChild(resultItem);
+            });
+        }
+
+        // 显示年份信息
+        function displayYearInfo(year, solarTerms) {
+            const infoDiv = document.getElementById('info');
+            infoDiv.innerHTML = '<h3>年份信息</h3>';
+            for (const term in solarTerms) {
+                infoDiv.innerHTML += `<p>${term}: ${solarTerms[term]}</p>`;
+            }
+        }
+
+        // 辅助函数
+
+        // 获取某日的生肖
+        function getDayZodiac(date) {
+            const lunar = Lunar.fromDate(date);
+            return lunar.getDayShengXiao();
+        }
+
+        // 获取某日的地支
+        function getDayEarthlyBranch(date) {
+            const lunar = Lunar.fromDate(date);
+            return lunar.getDayBranch();
+        }
+
+        // 获取某日的天干地支
+        function getDayHeavenlyStemEarthlyBranch(date) {
+            const lunar = Lunar.fromDate(date);
+            return lunar.getDayInGanZhi();
+        }
+
+        // 获取吉时
+        function getAuspiciousTimes(date) {
+            const dayBranch = getDayEarthlyBranch(date);
+            let startHour;
+            switch (dayBranch) {
+                case '子':
+                case '午':
+                    startHour = 15; // 申时为15-17点
+                    break;
+                case '丑':
+                case '未':
+                    startHour = 19; // 戌时19-21点
+                    break;
+                case '寅':
+                case '申':
+                    startHour = 23; // 子时23-1点
+                    break;
+                case '卯':
+                case '酉':
+                    startHour = 3; // 寅时3-5点
+                    break;
+                case '辰':
+                case '戌':
+                    startHour = 7; // 辰时7-9点
+                    break;
+                case '巳':
+                case '亥':
+                    startHour = 11; // 午时11-13点
+                    break;
+            }
+            const auspiciousHours = [startHour, (startHour + 2) % 24, (startHour + 8) % 24, (startHour + 10) % 24, (startHour + 16) % 24, (startHour + 22) % 24];
+            return auspiciousHours.map(h => `${padZero(h)}:00`);
+        }
+
+        // 获取相对方向
+        function getOppositeDirection(branch) {
+            const index = earthlyBranches.indexOf(branch);
+            const oppositeIndex = (index + 6) % 12;
+            return directions[earthlyBranches[oppositeIndex]];
+        }
+
+        // 获取下一属相
+        function getNextZodiac(zodiac) {
+            const index = zodiacs.indexOf(zodiac);
+            return zodiacs[(index + 1) % 12];
+        }
+
+        // 计算节气日期
+        function calculateSolarTerms(year) {
+            const solarTerms = {};
+            const lunarYear = LunarYear.fromYear(year);
+            const jieQiMap = lunarYear.getJieQiTable();
+            const terms = ['立春', '立夏', '立秋', '立冬'];
+            terms.forEach(term => {
+                const solar = jieQiMap[term];
+                if (solar) {
+                    solarTerms[term] = formatDate(solar.getSolar().toDate());
+                }
+            });
+            return solarTerms;
+        }
+
+        // 日期减一天
+        function subtractDate(dateStr, days) {
+            const date = new Date(dateStr);
+            date.setDate(date.getDate() - days);
+            return formatDate(date);
+        }
+
+        // 补零
+        function padZero(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        // 格式化日期
+        function formatDate(date) {
+            return `${date.getFullYear()}-${padZero(date.getMonth() + 1)}-${padZero(date.getDate())}`;
+        }
+
+        // 获取喜神方位
+        function getLuckyDirection(date) {
+            const lunar = Lunar.fromDate(date);
+            return lunar.getDayPositionXi();
+        }
+
+        // 获取季节
+        function getSeason(date) {
+            const month = date.getMonth() + 1;
+            if ([3,4,5].includes(month)) return '春';
+            if ([6,7,8].includes(month)) return '夏';
+            if ([9,10,11].includes(month)) return '秋';
+            return '冬';
+        }
+    </script>
+</body>
+</html>
