@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>农历阳历转换工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .input-section {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .year-input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 120px;
+        }
+        .submit-btn {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        .result-section, .filtered-result-section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .day-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        .day-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .day-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+        }
+        .day-info div {
+            padding: 5px 0;
+        }
+        .error {
+            color: red;
+            padding: 10px;
+            border: 1px solid red;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #fff2f2;
+        }
+        /* 分页样式 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .pagination button.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        .pagination button:hover {
+            background-color: #ddd;
+        }
+        /* 标题样式 */
+        .section-title {
+            margin-top: 40px;
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+        .date-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .date-input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .time-input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .add-btn {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .dates-list {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 50px;
+        }
+        .person-input {
+            margin-bottom: 15px;
+        }
+        .info-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .couple-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>农历阳历转换工具</h1>
+    
+    <div class="input-section">
+        <label for="yearInput"><strong>结婚年份：</strong></label>
+        <input type="number" id="yearInput" class="year-input" placeholder="如：2024" min="1900" max="2100">
+        <button onclick="handleYearChange()" class="submit-btn">查询</button>
+    </div>
+
+    <!-- 全年所有日期信息显示 -->
+    <div class="result-section" id="result">
+        <!-- 全年所有日期的信息将在这里显示 -->
+    </div>
+
+    <!-- 全年分页导航 -->
+    <div class="pagination" id="pagination">
+        <!-- 全年分页按钮将在这里生成 -->
+    </div>
+
+    <!-- 吉日筛选界面标题 -->
+    <div class="section-title">吉日筛选界面</div>
+
+    <!-- 筛选后的吉日信息显示 -->
+    <div class="filtered-result-section" id="filtered-result">
+        <!-- 筛选后的吉日信息将在这里显示 -->
+    </div>
+
+    <!-- 吉日分页导航 -->
+    <div class="pagination" id="filtered-pagination">
+        <!-- 吉日分页按钮将在这里生成 -->
+    </div>
+
+    <!-- 终极筛选界面标题 -->
+    <div class="section-title">吉日筛选终极界面</div>
+
+    <!-- 输入区域 -->
+    <div class="input-section">
+        <!-- 排除日期输入 -->
+        <div class="exclude-dates">
+            <label><strong>请输入父母生日及不想用的日子：</strong></label>
+            <div class="date-input-group">
+                <input type="text" id="excludeDate" placeholder="格式：MM-DD" class="date-input">
+                <label><input type="checkbox" id="isLunar"> 农历</label>
+                <button onclick="addExcludeDate()" class="add-btn">添加</button>
+            </div>
+            <div id="excludeDateslist" class="dates-list"></div>
+        </div>
+
+        <!-- 新人信息输入 -->
+        <div class="couple-info">
+            <div class="person-input">
+                <label><strong>新郎生日：</strong></label>
+                <input type="date" id="groomBirthday" class="date-input">
+                <input type="time" id="groomBirthTime" class="time-input">
+            </div>
+            <div class="person-input">
+                <label><strong>新娘生日：</strong></label>
+                <input type="date" id="brideBirthday" class="date-input">
+                <input type="time" id="brideBirthTime" class="time-input">
+            </div>
+            <button onclick="performUltimateFilter()" class="submit-btn">终极筛选</button>
+        </div>
+    </div>
+
+    <!-- 属相信息显示区域 -->
+    <div id="zodiacInfo" class="info-section">
+        <!-- 这里将显示新人属相和冲害组合信息 -->
+    </div>
+
+    <!-- 伴郎伴娘限制信息 -->
+    <div id="attendantsInfo" class="info-section">
+        <!-- 这里将显示不得参与伴郎伴娘和送迎亲的属相信息 -->
+    </div>
+
+    <!-- 终极筛选结果显示 -->
+    <div class="filtered-result-section" id="ultimate-filtered-result">
+        <!-- 终极筛选后的吉日信息将在这里显示 -->
+    </div>
+
+    <!-- 终极筛选分页导航 -->
+    <div class="pagination" id="ultimate-filtered-pagination">
+        <!-- 终极筛选分页按钮将在这里生成 -->
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.6.12/lunar.min.js"></script>
+    <script>
+        const DAYS_PER_PAGE = 30; // 每页显示的天数
+        let allDays = []; // 存储所有日期的信息
+        let currentPage = 1; // 当前页码
+        let totalPages = 1; // 总页数
+
+        let filteredDays = []; // 存储筛选后的吉日信息
+        let filteredCurrentPage = 1; // 筛选后当前页码
+        let filteredTotalPages = 1; // 筛选后总页数
+
+        let ultimateFilteredDays = []; // 存储终极筛选后的日期
+        let ultimateCurrentPage = 1;
+        let ultimateTotalPages = 1;
+        let excludeDates = new Set(); // 存储要排除的日期
+
+        // 添加排除日期
+        function addExcludeDate() {
+            const dateInput = document.getElementById('excludeDate').value;
+            const isLunar = document.getElementById('isLunar').checked;
+            const excludeDateslist = document.getElementById('excludeDateslist');
+
+            if (!dateInput.match(/^\d{2}-\d{2}$/)) {
+                alert('请按照 MM-DD 格式输入日期');
+                return;
+            }
+
+            const dateStr = isLunar ? `农历 ${dateInput}` : `公历 ${dateInput}`;
+            excludeDates.add({
+                date: dateInput,
+                isLunar: isLunar
+            });
+
+            // 显示已添加的日期
+            const dateSpan = document.createElement('span');
+            dateSpan.style.margin = '0 10px';
+            dateSpan.textContent = dateStr;
+            excludeDateslist.appendChild(dateSpan);
+        }
+
+        // 获取生肖
+        function getZodiac(date, time) {
+            if (!date) return null;
+            const solar = Solar.fromDate(new Date(date + ' ' + (time || '00:00')));
+            const lunar = solar.getLunar();
+            return lunar.getYearShengXiaoExact();
+        }
+
+        // 判断是否相冲
+        function isConflict(zodiac1, dayZhi) {
+            const conflictPairs = {
+                '子': '午', '午': '子',
+                '丑': '未', '未': '丑',
+                '寅': '申', '申': '寅',
+                '卯': '酉', '酉': '卯',
+                '辰': '戌', '戌': '辰',
+                '巳': '亥', '亥': '巳'
+            };
+            
+            const zodiacToZhi = {
+                '鼠': '子', '牛': '丑', '虎': '寅', '兔': '卯',
+                '龙': '辰', '蛇': '巳', '马': '午', '羊': '未',
+                '猴': '申', '鸡': '酉', '狗': '戌', '猪': '亥'
+            };
+
+            const zodiacZhi = zodiacToZhi[zodiac1];
+            return conflictPairs[zodiacZhi] === dayZhi;
+        }
+
+        // 判断是否相害
+        function isHarm(zodiac1, dayZhi) {
+            const harmPairs = {
+                '申': '亥', '亥': '申',
+                '子': '未', '未': '子',
+                '丑': '午', '午': '丑',
+                '寅': '巳', '巳': '寅',
+                '卯': '辰', '辰': '卯',
+                '酉': '戌', '戌': '酉'
+            };
+
+            const zodiacToZhi = {
+                '鼠': '子', '牛': '丑', '虎': '寅', '兔': '卯',
+                '龙': '辰', '蛇': '巳', '马': '午', '羊': '未',
+                '猴': '申', '鸡': '酉', '狗': '戌', '猪': '亥'
+            };
+
+            const zodiacZhi = zodiacToZhi[zodiac1];
+            return harmPairs[zodiacZhi] === dayZhi;
+        }
+
+        // 获取三合组合
+        function getTripleHarmony(zhi) {
+            const tripleHarmonyGroups = [
+                ['申', '子', '辰'],
+                ['寅', '午', '戌'],
+                ['巳', '酉', '丑'],
+                ['亥', '卯', '未']
+            ];
+            
+            return tripleHarmonyGroups.find(group => group.includes(zhi));
+        }
+
+        // 获取六合组合
+        function getSixHarmony(zhi) {
+            const sixHarmonyPairs = {
+                '寅': '亥', '亥': '寅',
+                '子': '丑', '丑': '子',
+                '卯': '戌', '戌': '卯',
+                '辰': '酉', '酉': '辰',
+                '巳': '申', '申': '巳',
+                '午': '未', '未': '午'
+            };
+            
+            return sixHarmonyPairs[zhi];
+        }
+
+        // 获取吉时
+        function getAuspiciousHours(dayZhi) {
+            const startHourMap = {
+                '子': '申', '午': '申',
+                '丑': '戌', '未': '戌',
+                '寅': '子', '申': '子',
+                '卯': '寅', '酉': '寅',
+                '辰': '辰', '戌': '辰',
+                '巳': '午', '亥': '午'
+            };
+
+            const zhiHours = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+            const startHour = startHourMap[dayZhi];
+            const startIndex = zhiHours.indexOf(startHour);
+            
+            // 第1,2,5,6,8,11个时辰为吉时
+            const auspiciousIndices = [0, 1, 4, 5, 7, 10];
+            return auspiciousIndices.map(i => {
+                const hourIndex = (startIndex + i) % 12;
+                return zhiHours[hourIndex];
+            });
+        }
+
+        // 执行终极筛选
+        function performUltimateFilter() {
+            const groomBirthday = document.getElementById('groomBirthday').value;
+            const groomBirthTime = document.getElementById('groomBirthTime').value;
+            const brideBirthday = document.getElementById('brideBirthday').value;
+            const brideBirthTime = document.getElementById('brideBirthTime').value;
+
+            if (!groomBirthday || !brideBirthday) {
+                alert('请输入新人的出生日期');
+                return;
+            }
+
+            const groomZodiac = getZodiac(groomBirthday, groomBirthTime);
+            const brideZodiac = getZodiac(brideBirthday, brideBirthTime);
+
+            // 显示属相信息
+            displayZodiacInfo(groomZodiac, brideZodiac);
+
+            // 显示伴郎伴娘限制信息
+            displayAttendantsInfo(brideZodiac);
+
+            // 过滤日期
+            ultimateFilteredDays = filteredDays.filter(day => {
+                // 检查忌信息中是否包含"诸事不宜"或"嫁娶"
+                if (day.ji.includes('诸事不宜') || day.ji.includes('嫁娶')) {
+                    return false;
+                }
+
+                // 检查是否在排除日期中
+                for (let excludeDate of excludeDates) {
+                    // 根据是否为农历进行比较
+                    if (excludeDate.isLunar) {
+                        const [month, dayNum] = excludeDate.date.split('-').map(Number);
+                        if (day.lunarMonth === month && day.lunarDay === dayNum) {
+                            return false;
+                        }
+                    } else {
+                        const solarDate = day.solar.split(' ')[0].substring(5); // 获取 MM-DD
+                        if (solarDate === excludeDate.date) {
+                            return false;
+                        }
+                    }
+                }
+
+                // 检查日支是否与新人属相相冲或相害
+                if (isConflict(groomZodiac, day.dayZhi) || isConflict(brideZodiac, day.dayZhi) ||
+                    isHarm(groomZodiac, day.dayZhi) || isHarm(brideZodiac, day.dayZhi)) {
+                    return false;
+                }
+
+                // 检查是否与新娘属相三合或六合
+                const tripleHarmonyGroup = getTripleHarmony(day.dayZhi);
+                const sixHarmonyPartner = getSixHarmony(day.dayZhi);
+                const brideZodiacZhi = getZodiacZhi(brideZodiac);
+                
+                return tripleHarmonyGroup?.includes(brideZodiacZhi) || sixHarmonyPartner === brideZodiacZhi;
+            });
+
+            // 更新分页和显示
+            ultimateTotalPages = Math.ceil(ultimateFilteredDays.length / DAYS_PER_PAGE);
+            ultimateCurrentPage = 1;
+            renderUltimateFilteredPage(ultimateCurrentPage);
+            renderUltimateFilteredPagination();
+        }
+
+        // 显示属相信息
+        function displayZodiacInfo(groomZodiac, brideZodiac) {
+            const zodiacInfo = document.getElementById('zodiacInfo');
+            zodiacInfo.innerHTML = `
+                <h3>新人属相信息</h3>
+                <p>新郎属相：${groomZodiac}</p>
+                <p>新娘属相：${brideZodiac}</p>
+                <p>相冲组合：子午、丑未、寅申、卯酉、辰戌、巳亥</p>
+                <p>相害组合：申亥、子未、丑午、寅巳、卯辰、酉戌</p>
+            `;
+        }
+
+        // 修改 displayAttendantsInfo 函数
+        function displayAttendantsInfo(brideZodiac) {
+            const attendantsInfo = document.getElementById('attendantsInfo');
+            const brideBirthday = document.getElementById('brideBirthday').value;
+            const brideBirthTime = document.getElementById('brideBirthTime').value;
+            
+            // 获取新娘八字
+            const brideSolar = Solar.fromDate(new Date(brideBirthday + ' ' + (brideBirthTime || '00:00')));
+            const brideLunar = brideSolar.getLunar();
+            const brideEightChar = {
+                year: brideLunar.getYearInGanZhi(),
+                month: brideLunar.getMonthInGanZhi(),
+                day: brideLunar.getDayInGanZhi(),
+                time: brideLunar.getTimeInGanZhi()
+            };
+
+            // 获取新娘生日日支
+            const brideDayZhi = brideLunar.getDayZhi();
+            
+            // 获取上车面向方向（新娘生日日支的对冲方）
+            const zhiDirections = {
+                '子': '正南', '午': '正北',
+                '丑': '西南', '未': '东北',
+                '寅': '东北', '申': '西南',
+                '卯': '正东', '酉': '西南',
+                '辰': '东南', '戌': '西南',
+                '巳': '东南', '亥': '西南'
+            };
+            const oppositeZhi = {
+                '子': '午', '午': '子',
+                '丑': '未', '未': '丑',
+                '寅': '申', '申': '寅',
+                '卯': '酉', '酉': '卯',
+                '辰': '戌', '戌': '辰',
+                '巳': '亥', '亥': '巳'
+            };
+            const carDirection = zhiDirections[oppositeZhi[brideDayZhi]];
+
+            // 获取与新娘属相相冲的属相
+            const brideZodiacZhi = getZodiacZhi(brideZodiac);
+            const conflictZhi = oppositeZhi[brideZodiacZhi];
+            const conflictZodiac = getZodiacFromZhi(conflictZhi);
+
+            // 获取伴郎伴娘限制信息
+            const nextZodiacZhi = getNextZodiacZhi(brideZodiacZhi);
+            const tripleHarmonyGroup = getTripleHarmony(nextZodiacZhi);
+            const restrictedZodiacs = tripleHarmonyGroup.map(zhi => `${zhi}${getZodiacFromZhi(zhi)}`).join('，');
+            
+            // 更新显示内容
+            attendantsInfo.innerHTML = `
+                <h3>新娘信息</h3>
+                <p><strong>新娘八字：</strong>${brideEightChar.year}年 ${brideEightChar.month}月 ${brideEightChar.day}日 ${brideEightChar.time}时</p>
+                <p><strong>上车面向方向：</strong>${carDirection}（新娘生日日支${brideDayZhi}的对冲方向）</p>
+                <p><strong>下车面向方向：</strong>当日的喜神或福神方向</p>
+                <p><strong>下车时需回避属相：</strong>${conflictZodiac}（与新娘属相${brideZodiac}相冲）</p>
+                <h3>伴郎伴娘限制信息</h3>
+                <p>不得参与伴郎伴娘和送迎亲的属相：${restrictedZodiacs}</p>
+                <p>（新娘属相为${brideZodiac}，下一属相为${getZodiacFromZhi(nextZodiacZhi)}，三合${tripleHarmonyGroup.join('')}）</p>
+            `;
+        }
+
+        // 获取生肖对应的地支
+        function getZodiacZhi(zodiac) {
+            const zodiacToZhi = {
+                '鼠': '子', '牛': '丑', '虎': '寅', '兔': '卯',
+                '龙': '辰', '蛇': '巳', '马': '午', '羊': '未',
+                '猴': '申', '鸡': '酉', '狗': '戌', '猪': '亥'
+            };
+            return zodiacToZhi[zodiac];
+        }
+
+        // 获取地支对应的生肖
+        function getZodiacFromZhi(zhi) {
+            const zhiToZodiac = {
+                '子': '鼠', '丑': '牛', '寅': '虎', '卯': '兔',
+                '辰': '龙', '巳': '蛇', '午': '马', '未': '羊',
+                '申': '猴', '酉': '鸡', '戌': '狗', '亥': '猪'
+            };
+            return zhiToZodiac[zhi];
+        }
+
+        // 获取下一个地支
+        function getNextZodiacZhi(zhi) {
+            const zhiOrder = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+            const currentIndex = zhiOrder.indexOf(zhi);
+            return zhiOrder[(currentIndex + 1) % 12];
+        }
+
+        // 渲染终极筛选分页
+        function renderUltimateFilteredPagination() {
+            const paginationDiv = document.getElementById('ultimate-filtered-pagination');
+            paginationDiv.innerHTML = '';
+
+            for (let i = 1; i <= ultimateTotalPages; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+                btn.dataset.page = i;
+                if (i === ultimateCurrentPage) {
+                    btn.classList.add('active');
+                }
+                btn.onclick = () => {
+                    ultimateCurrentPage = i;
+                    renderUltimateFilteredPage(ultimateCurrentPage);
+                };
+                paginationDiv.appendChild(btn);
+            }
+        }
+
+        // 渲染终极筛选页面
+        function renderUltimateFilteredPage(page) {
+            const resultDiv = document.getElementById('ultimate-filtered-result');
+            resultDiv.innerHTML = '';
+
+            const startIdx = (page - 1) * DAYS_PER_PAGE;
+            const endIdx = Math.min(startIdx + DAYS_PER_PAGE, ultimateFilteredDays.length);
+            const daysToRender = ultimateFilteredDays.slice(startIdx, endIdx);
+
+            daysToRender.forEach((day) => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'day-card';
+
+                // 获取吉时
+                const auspiciousHours = getAuspiciousHours(day.dayZhi);
+                
+                // 获取与新娘属相的三合或六合关系
+                const brideZodiac = getZodiac(document.getElementById('brideBirthday').value);
+                const brideZodiacZhi = getZodiacZhi(brideZodiac);
+                const tripleHarmonyGroup = getTripleHarmony(day.dayZhi);
+                const sixHarmonyPartner = getSixHarmony(day.dayZhi);
+                
+                let harmonyInfo = '';
+                if (tripleHarmonyGroup?.includes(brideZodiacZhi)) {
+                    harmonyInfo = `三合：${tripleHarmonyGroup.join('')}`;
+                } else if (sixHarmonyPartner === brideZodiacZhi) {
+                    harmonyInfo = `六合：${day.dayZhi}${sixHarmonyPartner}`;
+                }
+
+                dayCard.innerHTML = `
+                    <h3>${day.solar} / ${day.lunar}</h3>
+                    <div class="day-info">
+                        <div><strong>年干支:</strong> ${day.yearGanZhi}</div>
+                        <div><strong>月干支:</strong> ${day.monthGanZhi}</div>
+                        <div><strong>日干支:</strong> ${day.dayGanZhi}</div>
+                        <div><strong>生肖:</strong> ${day.shengXiao}</div>
+                        <div><strong>值星:</strong> ${day.zhiXing}</div>
+                        <div><strong>吉时:</strong> ${auspiciousHours.map(h => h + '时').join('、')}</div>
+                        <div><strong>与新娘属相关系:</strong> ${harmonyInfo}</div>
+                        <div><strong>宜:</strong> ${day.yi}</div>
+                        <div><strong>忌:</strong> ${day.ji}</div>
+                    </div>
+                `;
+
+                resultDiv.appendChild(dayCard);
+            });
+
+            const completionMsg = document.createElement('div');
+            completionMsg.style.marginTop = '10px';
+            completionMsg.style.textAlign = 'center';
+            completionMsg.style.color = '#4CAF50';
+            completionMsg.innerText = `显示第 ${page} 页，共 ${ultimateTotalPages} 页。`;
+            resultDiv.appendChild(completionMsg);
+        }
+
+        // 处理年份变化
+        function handleYearChange() {
+            const yearInput = document.getElementById('yearInput').value;
+            const resultDiv = document.getElementById('result');
+            const paginationDiv = document.getElementById('pagination');
+            const filteredResultDiv = document.getElementById('filtered-result');
+            const filteredPaginationDiv = document.getElementById('filtered-pagination');
+
+            // 重置全局变量
+            allDays = [];
+            currentPage = 1;
+            totalPages = 1;
+            paginationDiv.innerHTML = '';
+            resultDiv.innerHTML = '';
+
+            filteredDays = [];
+            filteredCurrentPage = 1;
+            filteredTotalPages = 1;
+            filteredPaginationDiv.innerHTML = '';
+            filteredResultDiv.innerHTML = '';
+
+            if (!yearInput) {
+                resultDiv.innerHTML = `<div class="error">请输入一个有效的年份。</div>`;
+                return;
+            }
+
+            const year = parseInt(yearInput);
+            if (isNaN(year) || year < 1900 || year > 2100) {
+                resultDiv.innerHTML = `<div class="error">请输入1900至2100之间的有效年份。</div>`;
+                return;
+            }
+
+            resultDiv.innerHTML = `<div>正在加载 ${year} 年的所有日期信息，请稍候...</div>`;
+
+            // 异步处理以避免阻塞UI
+            setTimeout(() => {
+                try {
+                    // 公历年开始和结束日期
+                    const startDate = new Date(year, 0, 1);
+                    const endDate = new Date(year, 11, 31);
+
+                    // 确保 startDate 和 endDate 是 Date 对象
+                    if (!(startDate instanceof Date) || isNaN(startDate)) {
+                        throw new Error("无法确定开始日期。");
+                    }
+                    if (!(endDate instanceof Date) || isNaN(endDate)) {
+                        throw new Error("无法确定结束日期。");
+                    }
+
+                    // 获取当年的所有日期信息
+                    const currentDate = new Date(startDate);
+                    const days = [];
+
+                    while (currentDate <= endDate) {
+                        const solarDate = new Date(currentDate);
+                        const lunar = Lunar.fromDate(solarDate);
+
+                        days.push({
+                            solar: lunar.getSolar().toFullString(), // 公历日期字符串
+                            lunar: lunar.toFullString(), // 农历日期字符串
+                            yearGanZhi: lunar.getYearInGanZhi(),
+                            monthGanZhi: lunar.getMonthInGanZhi(),
+                            dayGanZhi: lunar.getDayInGanZhi(),
+                            shengXiao: lunar.getYearShengXiao(),
+                            lunarMonth: lunar.getMonth(), // 农历月份（数字）
+                            lunarDay: lunar.getDay(), // 农历日（数字）
+                            // 获取值星
+                            zhiXing: lunar.getZhiXing(),
+                            // 获取上一节气和下一节气的名称和日期
+                            prevJieQi: lunar.getPrevJieQi(false) ? `${lunar.getPrevJieQi(false).getName()} (${formatJieQiTime(lunar.getPrevJieQi(false).getSolar())})` : '无',
+                            nextJieQi: lunar.getNextJieQi(false) ? `${lunar.getNextJieQi(false).getName()} (${formatJieQiTime(lunar.getNextJieQi(false).getSolar())})` : '无',
+                            yi: lunar.getDayYi().join('、'),
+                            ji: lunar.getDayJi().join('、'),
+                            dayZhi: lunar.getDayZhi(), // 日支
+                            dayGan: lunar.getDayGan()  // 日干
+                        });
+
+                        // 增加一天
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+
+                    allDays = days;
+                    totalPages = Math.ceil(allDays.length / DAYS_PER_PAGE);
+                    renderPagination();
+                    renderPage(currentPage);
+
+                    // 过滤吉日
+                    filterAuspiciousDays(year);
+                } catch (error) {
+                    resultDiv.innerHTML = `<div class="error">查询出错：${error.message}</div>`;
+                    console.error('查询错误:', error);
+                }
+            }, 100);
+        }
+
+        // 渲染指定页码的所有日期信息
+        function renderPage(page) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = ''; // 清空之前的内容
+
+            const startIdx = (page - 1) * DAYS_PER_PAGE;
+            const endIdx = Math.min(startIdx + DAYS_PER_PAGE, allDays.length);
+            const daysToRender = allDays.slice(startIdx, endIdx);
+
+            daysToRender.forEach((day) => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'day-card';
+
+                dayCard.innerHTML = `
+                    <h3>${day.solar} / ${day.lunar}</h3>
+                    <div class="day-info">
+                        <div><strong>年干支:</strong> ${day.yearGanZhi}</div>
+                        <div><strong>月干支:</strong> ${day.monthGanZhi}</div>
+                        <div><strong>日干支:</strong> ${day.dayGanZhi}</div>
+                        <div><strong>生肖:</strong> ${day.shengXiao}</div>
+                        <div><strong>值星:</strong> ${day.zhiXing}</div>
+                        <div><strong>上一节气:</strong> ${day.prevJieQi}</div>
+                        <div><strong>下一节气:</strong> ${day.nextJieQi}</div>
+                        <div><strong>宜:</strong> ${day.yi}</div>
+                        <div><strong>忌:</strong> ${day.ji}</div>
+                    </div>
+                `;
+
+                resultDiv.appendChild(dayCard);
+            });
+
+            // 更新分页按钮的激活状态
+            const paginationButtons = document.querySelectorAll('.pagination#pagination button');
+            paginationButtons.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.page) === page);
+            });
+
+            // 提示完成
+            const completionMsg = document.createElement('div');
+            completionMsg.style.marginTop = '10px';
+            completionMsg.style.textAlign = 'center';
+            completionMsg.style.color = '#4CAF50';
+            completionMsg.innerText = `显示第 ${page} 页，共 ${totalPages} 页。`;
+            resultDiv.appendChild(completionMsg);
+        }
+
+        // 渲染分页按钮
+        function renderPagination() {
+            const paginationDiv = document.getElementById('pagination');
+            paginationDiv.innerHTML = ''; // 清空之前的分页按钮
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+                btn.dataset.page = i;
+                if (i === currentPage) {
+                    btn.classList.add('active');
+                }
+                btn.onclick = () => {
+                    currentPage = i;
+                    renderPage(currentPage);
+                };
+                paginationDiv.appendChild(btn);
+            }
+        }
+
+        // 过滤吉日
+        function filterAuspiciousDays(year) {
+            const filteredResultDiv = document.getElementById('filtered-result');
+            const filteredPaginationDiv = document.getElementById('filtered-pagination');
+
+            // 定义排除规则
+            const excludeDays = new Set([1,3,5,7,9,11,13,14,15,17,18,22,23,25,27]); // 规则1
+            const excludeMonths = new Set([3,7,9]); // 规则2
+            const excludeSpecificDays = [
+                { month: 7, day: 29 }, // 规则3
+                { month: 11, day: 21 },
+                { month: 12, day: 19 }
+            ];
+            const excludeDayGanZhi = new Set(['甲寅', '庚申', '丁未', '己未']); // 规则6
+            const excludeZhiXing = new Set(['建', '满', '平', '收', '闭', '破']); // 规则8
+            const redShaRules = [
+                { months: [1,4,7,10], dayZhi: '酉' }, // 规则7
+                { months: [2,5,8,11], dayZhi: '巳' },
+                { months: [3,6,9,12], dayZhi: '丑' }
+            ];
+
+            // 获取节气日期
+            const lichunDateStr = getSolarTermDateFromAllDays('立春');
+            const lixiaDateStr = getSolarTermDateFromAllDays('立夏');
+            const liqiuDateStr = getSolarTermDateFromAllDays('立秋');
+            const lidongDateStr = getSolarTermDateFromAllDays('立冬');
+
+            const lichunDate = lichunDateStr !== '无' ? new Date(lichunDateStr) : null;
+            const lixiaDate = lixiaDateStr !== '无' ? new Date(lixiaDateStr) : null;
+            const liqiuDate = liqiuDateStr !== '无' ? new Date(liqiuDateStr) : null;
+            const lidongDate = lidongDateStr !== '无' ? new Date(lidongDateStr) : null;
+
+            // 获取节气前一天日期
+            const dayBeforeLichun = lichunDate ? new Date(lichunDate) : null;
+            if (dayBeforeLichun) dayBeforeLichun.setDate(dayBeforeLichun.getDate() - 1);
+            const dayBeforeLixia = lixiaDate ? new Date(lixiaDate) : null;
+            if (dayBeforeLixia) dayBeforeLixia.setDate(dayBeforeLixia.getDate() - 1);
+            const dayBeforeLiqiu = liqiuDate ? new Date(liqiuDate) : null;
+            if (dayBeforeLiqiu) dayBeforeLiqiu.setDate(dayBeforeLiqiu.getDate() - 1);
+            const dayBeforeLidong = lidongDate ? new Date(lidongDate) : null;
+            if (dayBeforeLidong) dayBeforeLidong.setDate(dayBeforeLidong.getDate() - 1);
+
+            // 定义三丧日的时间段
+            const period1Start = lichunDate;
+            const period1End = lixiaDate;
+            const period2Start = lixiaDate;
+            const period2End = liqiuDate;
+            const period3Start = liqiuDate;
+            const period3End = lidongDate;
+            const period4Start = lidongDate;
+            const period4End = lichunDate ? new Date(lichunDate.getFullYear() + 1, 0, 1) : null; // 下一年立春之前
+
+            // 过滤规则
+            filteredDays = allDays.filter(day => {
+                // 规则1：农历日为1、3、5、7、9、11、13、14、15、17、18、22、23、25、27
+                if (excludeDays.has(day.lunarDay)) return false;
+
+                // 规则2：农历月为3、7、9
+                if (excludeMonths.has(day.lunarMonth)) return false;
+
+                // 规则3：特定农历月日
+                for (let ex of excludeSpecificDays) {
+                    if (day.lunarMonth === ex.month && day.lunarDay === ex.day) {
+                        return false;
+                    }
+                }
+
+                // 规则4：节气前一天
+                const dayDate = new Date(day.solar.split(' ')[0]);
+                if (
+                    (dayBeforeLichun && isSameDate(dayDate, dayBeforeLichun)) ||
+                    (dayBeforeLixia && isSameDate(dayDate, dayBeforeLixia)) ||
+                    (dayBeforeLiqiu && isSameDate(dayDate, dayBeforeLiqiu)) ||
+                    (dayBeforeLidong && isSameDate(dayDate, dayBeforeLidong))
+                ) {
+                    return false;
+                }
+
+                // 规则5：三丧日
+                if (period1Start && period1End && dayDate >= period1Start && dayDate < period1End) {
+                    if (day.dayZhi === '辰') return false;
+                }
+                if (period2Start && period2End && dayDate >= period2Start && dayDate < period2End) {
+                    if (day.dayZhi === '未') return false;
+                }
+                if (period3Start && period3End && dayDate >= period3Start && dayDate < period3End) {
+                    if (day.dayZhi === '戌') return false;
+                }
+                if (period4Start && period4End && dayDate >= period4Start && dayDate < period4End) {
+                    if (day.dayZhi === '丑') return false;
+                }
+
+                // 规则6：八专日
+                if (excludeDayGanZhi.has(day.dayGanZhi)) return false;
+
+                // 规则7：红纱日
+                for (let rule of redShaRules) {
+                    if (rule.months.includes(day.lunarMonth) && day.dayZhi === rule.dayZhi) {
+                        return false;
+                    }
+                }
+
+                // 规则8：排除特定值星
+                if (excludeZhiXing.has(day.zhiXing)) return false;
+
+                // 如果不符合任何排除规则，则保留
+                return true;
+            });
+
+            // 计算筛选后的分页
+            filteredTotalPages = Math.ceil(filteredDays.length / DAYS_PER_PAGE);
+            renderFilteredPagination();
+            renderFilteredPage(filteredCurrentPage);
+        }
+
+        // 获取指定节气的日期字符串从 allDays 中
+        function getSolarTermDateFromAllDays(termName) {
+            for (let day of allDays) {
+                if (typeof day.nextJieQi === 'string' && day.nextJieQi.startsWith(termName)) {
+                    const dateStr = day.nextJieQi.match(/\((\d{4}-\d{2}-\d{2}) \d{2}:\d{2}\)/);
+                    if (dateStr && dateStr[1]) {
+                        return dateStr[1];
+                    }
+                }
+            }
+            return '无';
+        }
+
+        // 比较两个日期是否相同（年月日）
+        function isSameDate(date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
+
+        // 渲染筛选后的分页按钮
+        function renderFilteredPagination() {
+            const filteredPaginationDiv = document.getElementById('filtered-pagination');
+            filteredPaginationDiv.innerHTML = ''; // 清空之前的分页按钮
+
+            for (let i = 1; i <= filteredTotalPages; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+                btn.dataset.page = i;
+                if (i === filteredCurrentPage) {
+                    btn.classList.add('active');
+                }
+                btn.onclick = () => {
+                    filteredCurrentPage = i;
+                    renderFilteredPage(filteredCurrentPage);
+                };
+                filteredPaginationDiv.appendChild(btn);
+            }
+        }
+
+        // 渲染指定页码的筛选后吉日信息
+        function renderFilteredPage(page) {
+            const filteredResultDiv = document.getElementById('filtered-result');
+            filteredResultDiv.innerHTML = ''; // 清空之前的内容
+
+            const startIdx = (page - 1) * DAYS_PER_PAGE;
+            const endIdx = Math.min(startIdx + DAYS_PER_PAGE, filteredDays.length);
+            const daysToRender = filteredDays.slice(startIdx, endIdx);
+
+            daysToRender.forEach((day) => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'day-card';
+
+                dayCard.innerHTML = `
+                    <h3>${day.solar} / ${day.lunar}</h3>
+                    <div class="day-info">
+                        <div><strong>年干支:</strong> ${day.yearGanZhi}</div>
+                        <div><strong>月干支:</strong> ${day.monthGanZhi}</div>
+                        <div><strong>日干支:</strong> ${day.dayGanZhi}</div>
+                        <div><strong>生肖:</strong> ${day.shengXiao}</div>
+                        <div><strong>值星:</strong> ${day.zhiXing}</div>
+                        <div><strong>上一节气:</strong> ${day.prevJieQi}</div>
+                        <div><strong>下一节气:</strong> ${day.nextJieQi}</div>
+                        <div><strong>宜:</strong> ${day.yi}</div>
+                        <div><strong>忌:</strong> ${day.ji}</div>
+                    </div>
+                `;
+
+                // 显示值星状态
+                const zhiXingStatus = document.createElement('div');
+                zhiXingStatus.innerHTML = `<div><strong>值星状态:</strong> ${day.zhiXing}</div>`;
+                dayCard.querySelector('.day-info').appendChild(zhiXingStatus);
+
+                filteredResultDiv.appendChild(dayCard);
+            });
+
+            // 更新分页按钮的激活状态
+            const paginationButtons = document.querySelectorAll('.pagination#filtered-pagination button');
+            paginationButtons.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.page) === page);
+            });
+
+            // 提示完成
+            const completionMsg = document.createElement('div');
+            completionMsg.style.marginTop = '10px';
+            completionMsg.style.textAlign = 'center';
+            completionMsg.style.color = '#4CAF50';
+            completionMsg.innerText = `显示第 ${page} 页，共 ${filteredTotalPages} 页。`;
+            filteredResultDiv.appendChild(completionMsg);
+        }
+
+        // 格式化节气时间
+        function formatJieQiTime(solar) {
+            if (!solar) return '无';
+            const dateTime = solar.toFullString(); // 获取完整的公历日期时间字符串
+            const [date, time] = dateTime.split(' ');
+            return `${date} ${time}`;
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            // 默认填充当前年份
+            const today = new Date();
+            document.getElementById('yearInput').value = today.getFullYear();
+            handleYearChange();
+        }
+    </script>
+</body>
+</html>
