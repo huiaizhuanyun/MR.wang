@@ -203,6 +203,12 @@
             </select>
         </div>
         
+        <!-- 添加批量输入框 -->
+        <div style="margin-bottom: 20px;">
+            <input type="text" id="batchInput" placeholder="输入批量数字" style="width: 300px; margin-right: 10px;">
+            <button onclick="processBatchInput()">批量填入</button>
+        </div>
+        
         <div id="inputContainer">
             <div class="input-group">
                 <input type="text" class="number-input" placeholder="请输入数字或字母" oninput="handleInput(this)">
@@ -489,7 +495,7 @@
                     if (['生', '被生'].includes(relation)) {
                         return '阳生阴，女人享男人的福，男人付出多。。';
                     } else if (['克', '被克'].includes(relation)) {
-                        return '阳克阴，男强女弱，女人怕丈夫，受丈夫的气。。';
+                        return '阳克阴，男强女弱，女怕丈夫，受丈夫的气。。';
                     } else if (relation === '同') {
                         return '阳与阴同，关系温和。';
                     }
@@ -510,7 +516,7 @@
                         return '阴与阳同，。';
                     }
                 } else if (yinYang2 === '阴' && yinYang3 === '阴') {
-                    if (['��', '被生'].includes(relation)) {
+                    if (['生', '被生'].includes(relation)) {
                         return '阴生阴，温柔，闺蜜多，对父母好，对丈夫好。';
                     } else if (['克', '被克'].includes(relation)) {
                         return '阴克阴，做事不讲理，心狠。。';
@@ -565,7 +571,7 @@
                     let elementPrev = getFiveElement(prevNum, prevIndex, numbers);
                     let elementNext = getFiveElement(nextNum, nextIndex, numbers);
 
-                    // 检��是否被克
+                    // 检查是否被克
                     let relationPrev = getRelation(elementPrev, elementCurrent);
                     if (relationPrev === '克') {
                         descriptions.push(`<p>${type}：${parts[i]}（数字${currentNum}）被数字${prevNum}（${elementPrev}）克，易有疾病。</p>`);
@@ -646,26 +652,26 @@
             const healthIssues = {
                 1: '精神不好、血液毛病，静脉曲张、腿浮肿等毛病。',
                 2: '腰痛，泌尿，患肾病、视力下降、中毒等病症。',
-                3: '伤腿，石，胆囊，泌尿，易患胆结石、胆囊炎、手术之灾。',
+                3: '伤腿，结石，脾胃，胆囊，泌尿，易患胆结石、胆囊炎、手术之灾。',
                 4: '肝胆易病，四肢痛，毛发不好，皮肤病。',
                 5: '患肝胆病，坐骨神经疼、风湿病、五指、五趾易有病。',
                 6: '小腹疼，眼，睡眠，患结肠炎，心血管病，妇女易患妇科病。',
-                7: '心脏，血液病，高血压，眼。',
+                7: '心脏，血液病，高血压，眼，睡眠。',
                 8: '被盗，易患肠胃病，皮肤病，有手术之灾。妇女易患乳腺增生，乳腺癌。',
                 9: '皮肤，泌尿，受克大肠，肠道、胃肠易患病。食道、咽喉、淋巴、肛门、皮肤易生病。颈椎也会有毛病。',
-                10: '肺，牙，关节，扁桃体，受克易患肺病���浑身筋骨疼，口腔、口、牙齿易出现毛病。生疮、桃体发炎、风湿关节痛。',
+                10: '肺，牙，关节，扁桃体，受克易患肺病浑身筋骨疼，口腔溃疡、口、牙齿易出现毛病。生疮、桃体发炎、风湿关节痛。',
                 11: '牙，白血病，精神病，三叉神经疼、头盖骨生病、肺部生病、精神病、鼻窦炎、眼睛、耳朵易患病。',
                 12: '神经衰弱，腰，受克易患精神病，前列腺炎症，膀胱炎，泌尿生殖系统疾病。'
             };
             return healthIssues[num];
         }
 
-        // 物品推断
+        // 物品推断（优先看由克推断出的）
         function analyzeObjects(prenatalNumbers, postnatalNumbers) {
             let html = '<h2>断语4: 物品推断</h2>';
             let objectMap = {
                 1: '静水或青色物品',
-                2: '流水或水池、排水沟或蓝色物品',
+                2: '流水（空调口，地漏）或水池、排水沟或蓝色物品',
                 3: '白色或土或柜子',
                 4: '大树、木制品或紫色、绿色的东西',
                 5: '花草小树或绿色的东西',
@@ -1290,7 +1296,7 @@
             }
         }
 
-        // 页面载时初始化输入框长度
+        // 页面载时初��化输入框长度
         document.addEventListener('DOMContentLoaded', function() {
             updateInputMaxLength();
         });
@@ -1314,6 +1320,61 @@
             showPage();
             pageJumpInput.value = ''; // 清空输入框
         }
+
+        // 添加批量处理输入的函数
+        function processBatchInput() {
+            const batchInput = document.getElementById('batchInput');
+            const digitCount = parseInt(document.getElementById('digitCount').value);
+            let numbers = batchInput.value.replace(/[^0-9A-Z]/g, '').toUpperCase();
+            
+            if (!numbers) {
+                alert('请输入有效的数字或字母');
+                return;
+            }
+            
+            // 清空现有的输入框，只保留第一个
+            const container = document.getElementById('inputContainer');
+            while (container.children.length > 1) {
+                container.removeChild(container.lastChild);
+            }
+            
+            // 根据位数分割输入的数字
+            const chunks = [];
+            for (let i = 0; i < numbers.length; i += digitCount) {
+                const chunk = numbers.substr(i, digitCount);
+                if (chunk.length === digitCount) {
+                    chunks.push(chunk);
+                }
+            }
+            
+            // 填充到输入框
+            if (chunks.length > 0) {
+                // 填充第一个输入框
+                const firstInput = container.querySelector('.number-input');
+                firstInput.value = chunks[0];
+                
+                // 为剩余的数字创建新的输入框
+                for (let i = 1; i < chunks.length; i++) {
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'input-group';
+                    inputGroup.innerHTML = `
+                        <input type="text" class="number-input" placeholder="请输入${digitCount}位数字或字母" maxlength="${digitCount}" oninput="handleInput(this)" value="${chunks[i]}">
+                        <button type="button" class="remove-btn" onclick="removeInput(this)">删除</button>
+                    `;
+                    container.appendChild(inputGroup);
+                }
+                
+                // 显示所有删除按钮
+                const removeButtons = document.getElementsByClassName('remove-btn');
+                for (let btn of removeButtons) {
+                    btn.style.display = 'inline-block';
+                }
+                
+                // 清空批量输入框
+                batchInput.value = '';
+            }
+        }
     </script>
 </body>
 </html>
+ `
