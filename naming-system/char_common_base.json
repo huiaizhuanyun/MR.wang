@@ -3231,7 +3231,7 @@
 { "index" : 3230, "char" : "霄", "strokes" : 15, "pinyin" : [ "xiāo" ], "radicals" : "雨", "frequency" : 3, "structure" : "B0" },
 { "index" : 3231, "char" : "霉", "strokes" : 15, "pinyin" : [ "méi" ], "radicals" : "雨", "frequency" : 1, "structure" : "B0", "traditional" : "黴" },
 { "index" : 3232, "char" : "瞒", "traditional" : "瞞", "strokes" : 15, "pinyin" : [ "mán", "mén" ], "radicals" : "目", "frequency" : 1, "structure" : "H2" },
-{ "index" : 3233, "char" : "题", "traditional" : "題", "strokes" : 12, "pinyin" : [ "tí" ], "radicals" : "页", "frequency" : 0, "structure" : "H0" },
+{ "index" : 3233, "char" : "题", "traditional" : "題", "strokes" : 15, "pinyin" : [ "tí" ], "radicals" : "页", "frequency" : 0, "structure" : "H0" },
 { "index" : 3234, "char" : "暴", "strokes" : 15, "pinyin" : [ "bào", "pù" ], "radicals" : "日", "frequency" : 1, "structure" : "B0" },
 { "index" : 3235, "char" : "瞎", "strokes" : 15, "pinyin" : [ "xiā" ], "radicals" : "目", "frequency" : 1, "structure" : "H2" },
 { "index" : 3236, "char" : "嘻", "traditional" : "譆", "strokes" : 15, "pinyin" : [ "xī" ], "radicals" : "口", "frequency" : 3, "structure" : "H2", "variant" : "譆" },
