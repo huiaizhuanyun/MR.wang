@@ -3262,7 +3262,7 @@
 { "index" : 3261, "char" : "稻", "strokes" : 15, "pinyin" : [ "dào" ], "radicals" : "禾", "frequency" : 1, "structure" : "H2" },
 { "index" : 3262, "char" : "黎", "strokes" : 15, "pinyin" : [ "lí" ], "radicals" : "黍", "frequency" : 1, "structure" : "B0" },
 { "index" : 3263, "char" : "稿", "traditional" : "穢", "strokes" : 15, "pinyin" : [ "ɡǎo" ], "radicals" : "禾", "frequency" : 1, "structure" : "H2", "variant" : "稾" },
-{ "index" : 3264, "char" : "稼", "strokes" : 16, "pinyin" : [ "jià" ], "radicals" : "禾", "frequency" : 1, "structure" : "H2" },
+{ "index" : 3264, "char" : "稼", "strokes" : 15, "pinyin" : [ "jià" ], "radicals" : "禾", "frequency" : 1, "structure" : "H2" },
 { "index" : 3265, "char" : "箱", "strokes" : 15, "pinyin" : [ "xiānɡ" ], "radicals" : "竹", "frequency" : 1, "structure" : "B2" },
 { "index" : 3266, "char" : "篓", "traditional" : "簍", "strokes" : 15, "pinyin" : [ "lǒu" ], "radicals" : "竹", "frequency" : 2, "structure" : "B2" },
 { "index" : 3267, "char" : "箭", "strokes" : 15, "pinyin" : [ "jiàn" ], "radicals" : "竹", "frequency" : 1, "structure" : "B2" },
