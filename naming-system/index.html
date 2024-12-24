@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>起名系统</title>
+    <style>
+        /* styles.css */
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            margin-left: 200px;
+            padding: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .preselected-section {
+            position: fixed;
+            left: 0;
+            top: 20px;
+            width: 180px;
+            max-height: calc(100vh - 40px);
+            background-color: #fff;
+            border-right: 2px dashed #ccc;
+            padding: 15px;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .preselected-section h2 {
+            margin-top: 0;
+            font-size: 16px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        #finalize-selection-btn {
+            position: sticky;
+            bottom: 10px;
+            width: calc(100% - 20px);
+            margin: 10px;
+        }
+
+        .candidate-name-card, .preselected-name-card {
+            background-color: #e6e6e6;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            min-width: 60px;
+            text-align: center;
+            font-size: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .candidate-name-card:hover,
+        .preselected-name-card:hover {
+            background-color: #d4d4d4;
+        }
+
+        .meaning-area, .action-area {
+            display: none;
+        }
+
+        .preselect-btn {
+            display: none;
+        }
+
+        .popup {
+            z-index: 200;
+        }
+
+        .input-section, .options-section, .names-section {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .input-section, .options-section, .preselected-section, .names-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            font-size: 18px;
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #candidate-names, #preselected-names {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .combination-char {
+            background-color: #e6e6e6;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .combination-char .preselect-btn {
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .popup-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        @media screen and (max-width: 768px) {
+            .popup-content {
+                margin: calc(30vh + 40px) auto 10% auto;
+                width: 90%;
+                padding: 15px;
+            }
+
+            .popup {
+                padding-top: 30vh;
+            }
+
+            .close {
+                top: 10px;
+                right: 15px;
+                font-size: 24px;
+            }
+
+            #popup-text {
+                margin-top: 20px;
+                font-size: 14px;
+            }
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover, .close:focus {
+            color: black;
+        }
+
+        .preselected-section {
+            border: 2px dashed #ccc;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .preselected-section h2 {
+            margin-top: 0;
+        }
+
+        @media (max-width: 600px) {
+            .candidate-name-card, .preselected-name-card {
+                min-width: 50px;
+                font-size: 18px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                margin-left: 0;
+                padding: 10px;
+            }
+
+            .preselected-section {
+                position: fixed;
+                width: 100%;
+                left: 0;
+                top: 0;
+                max-height: 30vh;
+                border-right: none;
+                border-bottom: 2px dashed #ccc;
+                margin-bottom: 0;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                background-color: #fff;
+                z-index: 100;
+            }
+
+            .main-content {
+                margin-top: calc(30vh + 20px);
+                padding-top: 10px;
+            }
+
+            .preselected-section h2 {
+                margin: 0;
+                padding: 5px 0;
+                font-size: 14px;
+            }
+
+            #preselected-names {
+                max-height: calc(30vh - 80px);
+                overflow-y: auto;
+            }
+
+            #finalize-selection-btn {
+                position: absolute;
+                bottom: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 20px);
+                margin: 0;
+                padding: 5px;
+                font-size: 14px;
+            }
+
+            .candidate-name-card, .preselected-name-card {
+                padding: 10px;
+                min-width: 40px;
+                font-size: 16px;
+            }
+
+            .preselect-btn {
+                padding: 2px 4px;
+                font-size: 10px;
+            }
+
+            #combination-area {
+                margin-top: 20px;
+            }
+
+            #combination-area .columns {
+                flex-direction: column;
+            }
+
+            #combination-area h4 {
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media print {
+            .container {
+                margin-left: 0;
+            }
+
+            .preselected-section {
+                position: static;
+                width: 100%;
+                border: 1px solid #ccc;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="preselected-section">
+            <h2>预选名字</h2>
+            <div id="preselected-names"></div>
+            <button id="finalize-selection-btn">预选完成</button>
+        </div>
+        
+        <div class="main-content">
+            <h1>起名系统</h1>
+            <div class="input-section">
+                <label for="surname">输入姓氏：</label>
+                <input type="text" id="surname" maxlength="1" placeholder="姓氏">
+            </div>
+            <div class="options-section">
+                <label>选择姓名长度：</label>
+                <label><input type="radio" name="name-length" value="2" checked> 二字</label>
+                <label><input type="radio" name="name-length" value="3-middle"> 三字（中间生）</label>
+                <label><input type="radio" name="name-length" value="3-backward"> 三字（后向前）</label>
+            </div>
+            <button id="generate-btn">生成名字</button>
+
+            <div class="names-section">
+                <h2>候选名字</h2>
+                <div id="candidate-names"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹出窗口 -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span id="close-popup" class="close">&times;</span>
+            <p id="popup-text" style="white-space: pre-wrap;"></p>
+        </div>
+    </div>
+
+    <script>
+        // script.js
+
+        // 声明全局变量
+        let charCommon = [];
+        let charBase = [];
+        let charDetail = [];
+        let combinedChars = [];
+        let preselectedNames = [];
+        let nameLength = 2;
+
+        // 五行映射
+        const fiveElementsMap = {
+            1: '水',
+            2: '水',
+            12: '水',
+            3: '土',
+            9: '土',
+            4: '木',
+            5: '木',
+            6: '火',
+            7: '火',
+            8: '土', // 动态处理
+            10: '金',
+            11: '金'
+        };
+
+        // 五行生克关系
+        const generation = {
+            '金': '水',
+            '水': '木',
+            '木': '火',
+            '火': '土',
+            '土': '金'
+        };
+
+        // 加载JSON数据
+        async function loadData() {
+            try {
+                const [commonRes, baseRes, detailRes] = await Promise.all([
+                    fetch('char_common.json'),
+                    fetch('char_common_base.json'),
+                    fetch('char_common_detail.json')
+                ]);
+
+                charCommon = await commonRes.json();
+                charBase = await baseRes.json();
+                charDetail = await detailRes.json();
+
+                combineData();
+            } catch (error) {
+                console.error('Error loading JSON files:', error);
+                alert('加载数据失败，请确保JSON文件与HTML文件在同一目录下。');
+            }
+        }
+
+        // 合并三个JSON文件的数据
+        function combineData() {
+            combinedChars = charCommon.map(commonChar => {
+                const base = charBase.find(b => b.char === commonChar.char);
+                const detail = charDetail.find(d => d.char === commonChar.char);
+                return {
+                    index: commonChar.index,
+                    char: commonChar.char,
+                    frequency: commonChar.frequency,
+                    strokes: base ? base.strokes : null,
+                    pinyin: base ? base.pinyin : [],
+                    radicals: base ? base.radicals : '',
+                    structure: base ? base.structure : '',
+                    explanations: detail ? detail.pronunciations : []
+                };
+            });
+
+            // 过滤掉没有完整信息的字符
+            combinedChars = combinedChars.filter(c => c.strokes !== null && c.explanations.length > 0);
+
+            console.log('数据加载完成，共有字符数:', combinedChars.length);
+        }
+
+        // 获取五行
+        function getFiveElement(strokes, adjacentStrokes = null) {
+            if (strokes === 8) {
+                // 根据相邻数码判断五行
+                // 由于缺乏下文，这里简化处理为土
+                return '土';
+            }
+            return fiveElementsMap[strokes] || '未知';
+        }
+
+        // 计算姓氏的五行
+        function calculateSurnameElement(surname) {
+            if (!surname) return null;
+            const char = combinedChars.find(c => c.char === surname);
+            if (!char) return null;
+            return getFiveElement(char.strokes);
+        }
+
+        // 获取可选名字符
+        function getNameCharacters(element) {
+            return combinedChars.filter(c => getFiveElement(c.strokes) === element);
+        }
+
+        // 修改 createNameCard 函数
+        function createNameCard(char, position) {
+            const div = document.createElement('div');
+            div.className = 'candidate-name-card';
+            div.textContent = char;  // 只显示一次字符
+            
+            // 左半区点击查看释义
+            div.addEventListener('click', (e) => {
+                const rect = div.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                if (clickX < rect.width / 2) {
+                    showMeaning(char);
+                } else {
+                    // 右半区点击预选
+                    const nameLength = document.querySelector('input[name="name-length"]:checked').value;
+                    const surname = document.getElementById('surname').value.trim();
+                    
+                    if (nameLength === '2') {
+                        // 二字名：直接添加到预选名字显示区
+                        const fullName = surname + char;
+                        if (!preselectedNames.some(n => n.type === '2' && n.fullName === fullName)) {
+                            preselectedNames.push({
+                                type: '2',
+                                fullName: fullName
+                            });
+                            updatePreselectedDisplay();
+                        }
+                    } else {
+                        // 三字名：添加到组合区
+                        if (!preselectedNames.some(n => 
+                            n.type === '3' && 
+                            n.position === position && 
+                            n.char === char && 
+                            n.nameLength === nameLength
+                        )) {
+                            preselectedNames.push({ 
+                                type: '3',
+                                position: position, 
+                                char: char,
+                                selected: false,
+                                nameLength: nameLength
+                            });
+                            updateCombinationArea();
+                            updatePreselectedDisplay();
+                        }
+                    }
+                }
+            });
+
+            return div;
+        }
+
+        // 显示候选名字
+        function displayCandidates(candidates, mode) {
+            const container = document.getElementById('candidate-names');
+            container.innerHTML = '';
+
+            if (candidates.length === 0) {
+                container.innerHTML = '<p>未找到符合条件的名字。</p>';
+                return;
+            }
+
+            if (mode === 'both') {
+                // 显示第二位候选字区域
+                const secondDiv = document.createElement('div');
+                secondDiv.innerHTML = '<h3>第二位候选字</h3>';
+                const secondContainer = document.createElement('div');
+                secondContainer.style.display = 'flex';
+                secondContainer.style.flexWrap = 'wrap';
+                secondContainer.style.gap = '15px';
+                
+                candidates[0].chars.forEach(char => {
+                    const div = createNameCard(char, 'second');
+                    secondContainer.appendChild(div);
+                });
+                
+                secondDiv.appendChild(secondContainer);
+                container.appendChild(secondDiv);
+
+                // 显示第三位候选字区域
+                const thirdDiv = document.createElement('div');
+                thirdDiv.innerHTML = '<h3>第三位候选字</h3>';
+                const thirdContainer = document.createElement('div');
+                thirdContainer.style.display = 'flex';
+                thirdContainer.style.flexWrap = 'wrap';
+                thirdContainer.style.gap = '15px';
+                
+                candidates[1].chars.forEach(char => {
+                    const div = createNameCard(char, 'third');
+                    thirdContainer.appendChild(div);
+                });
+                
+                thirdDiv.appendChild(thirdContainer);
+                container.appendChild(thirdDiv);
+
+                addCombinationArea();
+            } else {
+                // 原有的二字名显示逻辑
+                candidates.forEach(char => {
+                    const div = createNameCard(char, 'second');
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        // 添加组合区函数
+        function addCombinationArea() {
+            const container = document.getElementById('candidate-names');
+            const combinationArea = document.createElement('div');
+            combinationArea.id = 'combination-area';
+            combinationArea.style.marginTop = '30px';
+            combinationArea.style.borderTop = '2px dashed #ccc';
+            combinationArea.style.padding = '20px 0';
+
+            // 添加标题
+            const title = document.createElement('h3');
+            title.textContent = '组合区';
+            combinationArea.appendChild(title);
+
+            // 创建两列布局
+            const columns = document.createElement('div');
+            columns.style.display = 'flex';
+            columns.style.gap = '20px';
+
+            // 第二位字列
+            const secondColumn = document.createElement('div');
+            secondColumn.style.flex = '1';
+            const secondTitle = document.createElement('h4');
+            secondTitle.textContent = '第二位候选字';
+            const secondContent = document.createElement('div');
+            secondContent.id = 'second-position-preview';
+            secondContent.style.display = 'flex';
+            secondContent.style.flexDirection = 'column';
+            secondContent.style.gap = '10px';
+            secondColumn.appendChild(secondTitle);
+            secondColumn.appendChild(secondContent);
+
+            // 第三位字列
+            const thirdColumn = document.createElement('div');
+            thirdColumn.style.flex = '1';
+            const thirdTitle = document.createElement('h4');
+            thirdTitle.textContent = '第三位候选字';
+            const thirdContent = document.createElement('div');
+            thirdContent.id = 'third-position-preview';
+            thirdContent.style.display = 'flex';
+            thirdContent.style.flexDirection = 'column';
+            thirdContent.style.gap = '10px';
+            thirdColumn.appendChild(thirdTitle);
+            thirdColumn.appendChild(thirdContent);
+
+            columns.appendChild(secondColumn);
+            columns.appendChild(thirdColumn);
+            combinationArea.appendChild(columns);
+            container.appendChild(combinationArea);
+
+            // 初始化组合区显示
+            updateCombinationArea();
+        }
+
+        // 添加组合区更新函数
+        function updateCombinationArea() {
+            const secondPreview = document.getElementById('second-position-preview');
+            const thirdPreview = document.getElementById('third-position-preview');
+            
+            if (!secondPreview || !thirdPreview) return;
+
+            // 清空现有内容
+            secondPreview.innerHTML = '';
+            thirdPreview.innerHTML = '';
+
+            // 获取当前选择的命名方式
+            const currentNameLength = document.querySelector('input[name="name-length"]:checked').value;
+
+            // 获取当前命名方式下的候选字
+            const secondChars = preselectedNames.filter(n => 
+                n.type === '3' && 
+                n.position === 'second' && 
+                n.nameLength === currentNameLength  // 添加命名方式标记
+            );
+            const thirdChars = preselectedNames.filter(n => 
+                n.type === '3' && 
+                n.position === 'third' && 
+                n.nameLength === currentNameLength  // 添加命名方式标记
+            );
+
+            // 建字符��函数
+            function createCharBox(char) {
+                const box = document.createElement('div');
+                box.className = 'combination-char';
+                box.style.display = 'flex';
+                box.style.alignItems = 'center';
+                box.style.padding = '8px';
+                box.style.backgroundColor = char.selected ? '#e8f5e9' : '#fff';
+                box.style.border = `2px solid ${char.selected ? '#4CAF50' : '#ccc'}`;
+                box.style.borderRadius = '4px';
+                box.style.marginBottom = '5px';
+                box.style.width = '100%';
+                box.style.boxSizing = 'border-box';
+
+                // 字符显示容器
+                const charContainer = document.createElement('div');
+                charContainer.style.display = 'flex';
+                charContainer.style.alignItems = 'center';
+                charContainer.style.flex = '1';
+                charContainer.style.gap = '10px';
+
+                // 字符显示
+                const charSpan = document.createElement('span');
+                charSpan.textContent = char.char;
+                charSpan.style.fontSize = '20px';
+                charSpan.style.cursor = 'pointer';
+                charSpan.addEventListener('click', () => showMeaning(char.char));
+                charContainer.appendChild(charSpan);
+
+                // 按钮组
+                const btnGroup = document.createElement('div');
+                btnGroup.style.display = 'flex';
+                btnGroup.style.gap = '5px';
+                btnGroup.style.marginLeft = '10px';
+
+                // 选择按钮
+                const selectBtn = document.createElement('button');
+                selectBtn.textContent = '+';
+                selectBtn.className = 'preselect-btn';
+                selectBtn.style.width = '24px';
+                selectBtn.style.height = '24px';
+                selectBtn.style.padding = '0';
+                selectBtn.style.minWidth = '24px';
+                selectBtn.style.fontSize = '16px';
+                selectBtn.style.lineHeight = '24px';
+                selectBtn.style.position = 'static';
+                selectBtn.title = char.selected ? '取消选择' : '选择';
+                selectBtn.style.backgroundColor = char.selected ? '#ff9800' : '#4CAF50';
+
+                // 删除按钮
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '-';
+                deleteBtn.className = 'preselect-btn';
+                deleteBtn.style.width = '24px';
+                deleteBtn.style.height = '24px';
+                deleteBtn.style.padding = '0';
+                deleteBtn.style.minWidth = '24px';
+                deleteBtn.style.fontSize = '16px';
+                deleteBtn.style.lineHeight = '24px';
+                deleteBtn.style.position = 'static';
+                deleteBtn.title = '删除';
+                deleteBtn.style.backgroundColor = '#ff4444';
+
+                // 添加选择按钮事件
+                selectBtn.addEventListener('click', () => {
+                    // 取消同列其他字的选中状态
+                    preselectedNames.forEach(n => {
+                        if (n.type === '3' && n.position === char.position && n !== char) {
+                            n.selected = false;
+                        }
+                    });
+                    // 切换当前字的选中状态
+                    char.selected = !char.selected;
+
+                    // 如果选中了一个第二位字和一个第三位字，就组合成名字
+                    if (char.selected) {
+                        const otherPosition = char.position === 'second' ? 'third' : 'second';
+                        const otherSelected = preselectedNames.find(n => 
+                            n.type === '3' && 
+                            n.position === otherPosition && 
+                            n.selected &&
+                            n.nameLength === char.nameLength  // 确保是同一种命名方式
+                        );
+                        
+                        if (otherSelected) {
+                            const surname = document.getElementById('surname').value.trim();
+                            const second = char.position === 'second' ? char : otherSelected;
+                            const third = char.position === 'third' ? char : otherSelected;
+                            const combinedName = {
+                                type: 'combined',
+                                fullName: surname + second.char + third.char,
+                                second: second.char,
+                                third: third.char,
+                                nameLength: char.nameLength  // 记录命名方式
+                            };
+                            
+                            if (!preselectedNames.some(n => 
+                                n.type === 'combined' && 
+                                n.fullName === combinedName.fullName
+                            )) {
+                                preselectedNames.push(combinedName);
+                            }
+                        }
+                    }
+
+                    updateCombinationArea();
+                    updatePreselectedDisplay();
+                });
+
+                // 添加删除按钮事件
+                deleteBtn.addEventListener('click', () => {
+                    // 删除该字及相关组合
+                    preselectedNames = preselectedNames.filter(n => n !== char);
+                    // 删除包含该字的所有组合字（同一命名方式）
+                    preselectedNames = preselectedNames.filter(n => 
+                        !(n.type === 'combined' && 
+                          n.nameLength === char.nameLength &&  // 确保只删除同一命名方式的组合
+                          (n.second === char.char || n.third === char.char))
+                    );
+                    updateCombinationArea();
+                    updatePreselectedDisplay();
+                });
+
+                btnGroup.appendChild(selectBtn);
+                btnGroup.appendChild(deleteBtn);
+                charContainer.appendChild(btnGroup);
+                box.appendChild(charContainer);
+                return box;
+            }
+
+            // 显示所有字符
+            secondChars.forEach(char => {
+                secondPreview.appendChild(createCharBox(char));
+            });
+
+            thirdChars.forEach(char => {
+                thirdPreview.appendChild(createCharBox(char));
+            });
+        }
+
+        // 展示字寓意
+        function showMeaning(name) {
+            const popup = document.getElementById('popup');
+            const popupText = document.getElementById('popup-text');
+            let meaning = '';
+
+            for (let char of name) {
+                const c = combinedChars.find(c => c.char === char);
+                if (c) {
+                    const pron = c.pinyin.join(', ');
+                    const explanations = c.explanations.map(pron => pron.explanations.map(exp => exp.content).join('; ')).join('\n');
+                    meaning += `${char} (${pron}): ${explanations}\n\n`;
+                }
+            }
+
+            popupText.textContent = meaning.trim();
+            popup.style.display = 'block';
+        }
+
+        // 关闭弹窗
+        function closePopup() {
+            const popup = document.getElementById('popup');
+            popup.style.display = 'none';
+        }
+
+        // 添加预选字
+        function addPreselectedName(name) {
+            const nameLength = document.querySelector('input[name="name-length"]:checked').value;
+            const surname = document.getElementById('surname').value.trim();
+            
+            if (nameLength === '2') {
+                // 二字姓名：直接显示 姓氏+名字
+                if (!preselectedNames.includes(surname + name)) {
+                    preselectedNames.push(surname + name);
+                }
+            } else if (nameLength === '3-middle' || nameLength === '3-backward') {
+                // 三字姓名：分别存储第二个字和第三个字的候选字
+                const position = document.getElementById('current-position').value; // 新：用于标识当前选择的是第二个还是第三个字
+                if (position === 'second') {
+                    if (!preselectedNames.some(n => n.position === 'second' && n.char === name)) {
+                        preselectedNames.push({ position: 'second', char: name });
+                    }
+                } else if (position === 'third') {
+                    if (!preselectedNames.some(n => n.position === 'third' && n.char === name)) {
+                        preselectedNames.push({ position: 'third', char: name });
+                    }
+                }
+            }
+            updatePreselectedDisplay();
+        }
+
+        // 更新预选显示
+        function updatePreselectedDisplay() {
+            const container = document.getElementById('preselected-names');
+            container.innerHTML = '';
+
+            function createPreselectedCard(name, showMeaningText, deleteHandler) {
+                const div = document.createElement('div');
+                div.className = 'preselected-name-card';
+                div.textContent = name;  // 只显示一次名字
+                
+                // 左半区点击查看释义，右半区点击删除
+                div.addEventListener('click', (e) => {
+                    const rect = div.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    if (clickX < rect.width / 2) {
+                        showMeaning(showMeaningText);
+                    } else {
+                        deleteHandler();
+                    }
+                });
+
+                return div;
+            }
+
+            // 显示二字名和三字名组合
+            preselectedNames.forEach(name => {
+                if (name.type === '2') {
+                    const card = createPreselectedCard(
+                        name.fullName,
+                        name.fullName.slice(1),
+                        () => {
+                            preselectedNames = preselectedNames.filter(n => n !== name);
+                            updatePreselectedDisplay();
+                        }
+                    );
+                    container.appendChild(card);
+                } else if (name.type === 'combined') {
+                    const card = createPreselectedCard(
+                        name.fullName,
+                        name.second + name.third,
+                        () => {
+                            preselectedNames = preselectedNames.filter(n => n !== name);
+                            updatePreselectedDisplay();
+                        }
+                    );
+                    container.appendChild(card);
+                }
+            });
+        }
+
+        // 生成名字
+        function generateNames() {
+            const surname = document.getElementById('surname').value.trim();
+            if (!surname) {
+                alert('请输入姓氏');
+                return;
+            }
+
+            const surnameElement = calculateSurnameElement(surname);
+            if (!surnameElement) {
+                alert('未找到姓氏对应的五行或数据不完整');
+                return;
+            }
+
+            const nameLength = document.querySelector('input[name="name-length"]:checked').value;
+            let candidates = [];
+
+            if (nameLength === '2') {
+                // 获取能生姓氏五行的五行
+                const secondRequiredElements = Object.entries(generation)
+                    .filter(([element, generates]) => generates === surnameElement)
+                    .map(([element]) => element);
+
+                if (secondRequiredElements.length === 0) {
+                    alert('无法确定名的五行');
+                    return;
+                }
+
+                // 获取所有符合五行要求的候选字
+                const nameChars = combinedChars.filter(char => 
+                    secondRequiredElements.includes(getFiveElement(char.strokes))
+                );
+
+                candidates = nameChars.map(c => c.char);
+                displayCandidates(candidates, 'second');
+            } else if (nameLength === '3-middle') {
+                // 原有的三字姓名逻辑（中间生）保持不变
+                const secondRequiredElement = generation[surnameElement];
+                if (!secondRequiredElement) {
+                    alert('无法确定第二个字的五行');
+                    return;
+                }
+                
+                // 获取第二位候选字
+                const secondNameChars = getNameCharacters(secondRequiredElement);
+                
+                // 第三位候选字的五行需要与姓氏五行相同
+                const thirdNameChars = combinedChars.filter(char => 
+                    getFiveElement(char.strokes) === surnameElement
+                );
+                
+                // 同时显示第二位和第三位候选字
+                displayCandidates([
+                    { position: 'second', chars: secondNameChars.map(c => c.char) },
+                    { position: 'third', chars: thirdNameChars.map(c => c.char) }
+                ], 'both');
+            } else if (nameLength === '3-backward') {
+                // 新增的三字姓名逻辑（后向前）
+                // 第二位字需要被第三位字，且能生姓氏
+                const secondRequiredElements = Object.entries(generation)
+                    .filter(([element, generates]) => generates === surnameElement)
+                    .map(([element]) => element);
+                    
+                if (secondRequiredElements.length === 0) {
+                    alert('无法确定第二个字的五行');
+                    return;
+                }
+
+                // 获取第二位候选字
+                const secondNameChars = combinedChars.filter(char => 
+                    secondRequiredElements.includes(getFiveElement(char.strokes))
+                );
+
+                // 获取第三位候选字：需要能生第二位字的五行
+                const thirdNameChars = combinedChars.filter(char => {
+                    const charElement = getFiveElement(char.strokes);
+                    return secondRequiredElements.some(element => 
+                        generation[charElement] === element
+                    );
+                });
+
+                // 同时显示第二位和第三位候选字
+                displayCandidates([
+                    { position: 'second', chars: secondNameChars.map(c => c.char) },
+                    { position: 'third', chars: thirdNameChars.map(c => c.char) }
+                ], 'both');
+            }
+        }
+
+        // 完成预选
+        function finalizeSelection() {
+            const surname = document.getElementById('surname').value.trim();
+            if (!surname) {
+                alert('请输入姓氏');
+                return;
+            }
+
+            if (preselectedNames.length === 0) {
+                alert('请先预选至少一个名字');
+                return;
+            }
+
+            let finalNames = [];
+
+            // 获取所有二字名
+            const twoCharNames = preselectedNames
+                .filter(n => n.type === '2')
+                .map(n => n.fullName);
+            
+            // 获取所有三字名组合
+            const threeCharNames = preselectedNames
+                .filter(n => n.type === 'combined')
+                .map(n => n.fullName);
+            
+            // 合并所有名字
+            finalNames = [...twoCharNames, ...threeCharNames];
+
+            if (finalNames.length > 0) {
+                // 分类显示
+                let message = '';
+                if (twoCharNames.length > 0) {
+                    message += '二字名：\n' + twoCharNames.join('\n') + '\n\n';
+                }
+                if (threeCharNames.length > 0) {
+                    message += '三字名：\n' + threeCharNames.join('\n');
+                }
+                alert(message.trim());
+            } else {
+                alert('没有生成最终名字。');
+            }
+        }
+
+        // 事件监听
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            preselectedNames = []; // 清空预选
+            updatePreselectedDisplay();
+            generateNames();
+        });
+
+        document.getElementById('finalize-selection-btn').addEventListener('click', () => {
+            finalizeSelection();
+        });
+
+        document.getElementById('close-popup').addEventListener('click', () => {
+            closePopup();
+        });
+
+        // 点击弹窗外部关闭
+        window.addEventListener('click', (event) => {
+            const popup = document.getElementById('popup');
+            if (event.target == popup) {
+                closePopup();
+            }
+        });
+
+        // 初始化加载数据
+        loadData();
+
+        // 修改 name-length radio 的事件监听
+        document.querySelectorAll('input[name="name-length"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                generateNames();
+            });
+        });
+    </script>
+</body>
+</html>
